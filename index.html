@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WebToMobile Pro Posting Console</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,system-ui,sans-serif;background:#0a0e1a;color:#e6ecf5;padding:20px;max-width:820px;margin:0 auto}
+h1{color:#2563EB;margin-bottom:4px;font-size:22px;font-weight:700}
+.sub{color:#6b7a90;margin-bottom:24px;font-size:13px}
+.count{color:#2563EB;font-size:14px;margin-bottom:20px;font-weight:600}
+h2{color:#c8d3e2;font-size:16px;margin:24px 0 12px;border-bottom:1px solid #1a2237;padding-bottom:6px}
+.card{background:#111827;border:1px solid #1f2a44;border-radius:10px;padding:16px;margin-bottom:16px}
+.card.done{opacity:.3;pointer-events:none}
+.hdr{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.plat{font-weight:700;font-size:12px;padding:2px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.5px}
+.plat-linkedin{background:#0a66c2;color:#fff}
+.plat-instagram{background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff}
+.plat-tiktok{background:#000;color:#fff;border:1px solid #25f4ee}
+.plat-facebook{background:#1877f2;color:#fff}
+.dt{color:#6b7a90;font-size:12px}
+.meta{color:#4a5568;font-size:11px;margin-left:auto}
+.cap{background:#0a0e1a;border:1px solid #1f2a44;border-radius:6px;padding:12px;margin-bottom:12px}
+.captxt{font-size:14px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+.media{margin-bottom:12px}
+.prev{width:100%;max-width:300px;border-radius:8px;margin-bottom:8px;display:block}
+details{margin-bottom:12px}
+summary{cursor:pointer;color:#2563EB;font-size:13px;margin-bottom:6px;font-weight:600}
+.vo{background:#0a0e1a;padding:10px;border-radius:6px;font-size:13px;line-height:1.6;white-space:pre-wrap;color:#a8b5c8}
+table{width:100%;font-size:12px;border-collapse:collapse}
+th{text-align:left;color:#6b7a90;padding:4px 6px;border-bottom:1px solid #1f2a44}
+td{padding:6px;border-bottom:1px solid #111827;vertical-align:top}
+td a{color:#2563EB}
+.cta{font-size:12px;color:#6b7a90;font-style:italic;margin-bottom:12px}
+.acts{display:flex;gap:8px}
+.btn{border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600}
+.cp{background:#1f2a44;color:#2563EB;float:right;margin-top:8px}
+.dl{background:#1f2a44;color:#2563EB;display:inline-block;text-decoration:none;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:600}
+.post{background:linear-gradient(135deg,#1E40AF,#2563EB,#3B82F6);color:#fff;flex:1}
+.skip{background:#1f2a44;color:#6b7a90}
+.btn:hover,.dl:hover{opacity:.85}
+.empty{color:#4a5568;text-align:center;padding:40px}
+.toast{position:fixed;bottom:20px;right:20px;background:#2563EB;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;display:none;z-index:99;font-weight:600}
+.loading{color:#2563EB;text-align:center;padding:60px;font-size:16px}
+.hint{color:#6b7a90;font-size:12px;margin-top:6px;font-style:italic}
+video.prev{background:#000}
+</style>
+</head>
+<body>
+<h1>WebToMobile Pro Posting Console</h1>
+<div class="sub">Pull content. Post it. Mark done.</div>
+<div id="app"><div class="loading">Loading posts...</div></div>
+<div class="toast" id="toast"></div>
+<script>
+const API="https://dhriiwtpsaorqlxiuayu.supabase.co/functions/v1/wtm-posting-console";
+const app=document.getElementById("app");
+const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+
+const PLATFORM_LABEL={linkedin:"LinkedIn",instagram:"Instagram",tiktok:"TikTok",facebook:"Facebook"};
+const PLATFORM_ORDER=["linkedin","instagram","tiktok","facebook"];
+
+function esc(s){return(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.style.display="block";setTimeout(()=>t.style.display="none",2000)}
+
+function renderCard(p){
+  const rs=p.review_data?.score||"--";
+  const bt=p.performance_tags?.beat||"--";
+  const tn=p.performance_tags?.emotional_tone||"--";
+  const scenes=(p.video_script?.scenes||[]);
+  const label=PLATFORM_LABEL[p.platform]||p.platform;
+  let h=`<div class="card" id="c-${p.id}">
+    <div class="hdr">
+      <span class="plat plat-${p.platform}">${label}</span>
+      <span class="dt">${p.scheduled_for}</span>
+      <span class="meta">Review: ${rs} | Beat: ${bt} | Tone: ${tn}</span>
+    </div>
+    <div class="cap">
+      <div class="captxt" id="cap-${p.id}">${esc(p.caption)}</div>
+      <button class="btn cp" onclick="copyCaption('${p.id}')">Copy Caption</button>
+    </div>`;
+  if(p.media_url){
+    const isVid=/\.(mp4|mov|webm)(\?|$)/i.test(p.media_url);
+    const fname=(p.media_url.split("?")[0].split("/").pop())||(isVid?"video.mp4":"image.png");
+    const isSb=/supabase\.co\/storage\//.test(p.media_url);
+    const sep=p.media_url.includes("?")?"&":"?";
+    const dlUrl=isSb?`${p.media_url}${sep}download=${encodeURIComponent(fname)}`:p.media_url;
+    const preview=isVid
+      ? `<video src="${p.media_url}" class="prev" controls playsinline preload="metadata"></video>`
+      : `<img src="${p.media_url}" class="prev"/>`;
+    const dlLabel=isVid?"Save Video":"Save Image";
+    const iosHint=isIOS?(isVid
+      ? `<div class="hint">iPhone: tap <strong>Save Video</strong> to download to Files. Then move it to Photos from the Files app if needed.</div>`
+      : `<div class="hint">iPhone: long-press the preview &gt; Save to Photos</div>`):"";
+    h+=`<div class="media">
+      ${preview}
+      <a href="${dlUrl}" download="${fname}" target="_blank" rel="noopener" class="dl">${dlLabel}</a>
+      ${iosHint}
+    </div>`;
+  }
+  if(p.voiceover_text){
+    h+=`<details><summary>Voiceover Script</summary>
+      <pre class="vo" id="vo-${p.id}">${esc(p.voiceover_text)}</pre>
+      <button class="btn cp" onclick="copyVo('${p.id}')">Copy Voiceover</button>
+    </details>`;
+  }
+  if(scenes.length>0){
+    h+=`<details><summary>Video Scenes (${scenes.length})</summary><table>
+      <tr><th>#</th><th>Time</th><th>Visual</th><th>Text</th><th>Stock Search</th></tr>`;
+    for(const s of scenes){
+      const q=encodeURIComponent(s.stock_search||s.visual||"");
+      h+=`<tr><td>${s.scene_number}</td><td>${s.duration}</td><td>${esc(s.visual)}</td><td><strong>${esc(s.text_overlay)}</strong></td><td><a href="https://www.pexels.com/search/videos/${q}" target="_blank">${esc(s.stock_search)}</a></td></tr>`;
+    }
+    h+=`</table></details>`;
+  }
+  if(p.video_script?.cta) h+=`<div class="cta">CTA: ${esc(p.video_script.cta)}</div>`;
+  h+=`<div class="acts">
+    <button class="btn post" onclick="markPosted('${p.id}')">Mark Posted</button>
+    <button class="btn skip" onclick="skipPost('${p.id}')">Skip</button>
+  </div></div>`;
+  return h;
+}
+
+async function load(){
+  try{
+    const r=await fetch(API);
+    const d=await r.json();
+    const posts=d.posts||[];
+    if(posts.length===0){app.innerHTML='<div class="empty">No posts ready. Check back after 7 AM CT.</div>';return;}
+    let html=`<div class="count">${posts.length} post${posts.length!==1?"s":""} ready</div>`;
+    for(const plat of PLATFORM_ORDER){
+      const group=posts.filter(p=>p.platform===plat);
+      if(group.length){
+        html+=`<h2>${PLATFORM_LABEL[plat]} (${group.length})</h2>`+group.map(renderCard).join("");
+      }
+    }
+    app.innerHTML=html;
+  }catch(e){app.innerHTML=`<div class="empty">Error: ${e.message}</div>`;}
+}
+
+async function copyText(text,label){
+  try{
+    if(navigator.clipboard&&window.isSecureContext){
+      await navigator.clipboard.writeText(text);
+    }else{
+      const ta=document.createElement("textarea");
+      ta.value=text;ta.setAttribute("readonly","");
+      ta.style.cssText="position:fixed;top:-1000px;opacity:0";
+      document.body.appendChild(ta);
+      ta.select();ta.setSelectionRange(0,ta.value.length);
+      const ok=document.execCommand("copy");
+      document.body.removeChild(ta);
+      if(!ok)throw new Error("execCommand failed");
+    }
+    toast(label+" copied!");
+  }catch(e){
+    toast("Copy blocked - select text manually");
+  }
+}
+function copyCaption(id){copyText(document.getElementById("cap-"+id).textContent,"Caption")}
+function copyVo(id){copyText(document.getElementById("vo-"+id).textContent,"Voiceover")}
+
+async function markPosted(id){
+  if(!confirm("Mark as posted?"))return;
+  const r=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"mark_posted",id})});
+  if(r.ok){document.getElementById("c-"+id).classList.add("done");toast("Posted!")}
+  else toast("Error");
+}
+async function skipPost(id){
+  const reason=prompt("Skip reason (optional):");
+  if(reason===null)return;
+  const r=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"skip",id,reason})});
+  if(r.ok){document.getElementById("c-"+id).classList.add("done");toast("Skipped")}
+  else toast("Error");
+}
+
+load();
+</script>
+</body>
+</html>
