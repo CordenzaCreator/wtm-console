@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>WTM — Close</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,system-ui,sans-serif;background:#0a0e1a;color:#e6ecf5;padding:20px 16px 40px;max-width:480px;margin:0 auto;min-height:100vh}
+h1{color:#2563EB;font-size:20px;font-weight:700;margin-bottom:2px}
+.sub{color:#6b7a90;font-size:13px;margin-bottom:24px}
+label{display:block;color:#6b7a90;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+input{width:100%;background:#111827;border:1px solid #1f2a44;border-radius:8px;padding:14px;color:#e6ecf5;font-size:16px;outline:none;transition:border-color .15s}
+input:focus{border-color:#2563EB}
+input::placeholder{color:#374151}
+.field{margin-bottom:16px}
+.hint{color:#4a5568;font-size:12px;margin-top:5px}
+/* Package selector */
+.pkg-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+.pkg-card{background:#111827;border:2px solid #1f2a44;border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;user-select:none}
+.pkg-card.active{border-color:#2563EB;background:#0d1933}
+.pkg-name{font-size:13px;font-weight:700;color:#e6ecf5;margin-bottom:4px}
+.pkg-price{font-size:12px;color:#2563EB;font-weight:600}
+.pkg-dep{font-size:11px;color:#6b7a90;margin-top:2px}
+/* Platform toggle */
+.toggle-row{display:flex;gap:8px;margin-bottom:24px}
+.toggle-btn{flex:1;padding:10px;border:2px solid #1f2a44;border-radius:8px;background:#111827;color:#6b7a90;font-size:13px;font-weight:600;cursor:pointer;text-align:center;transition:all .15s}
+.toggle-btn.active{border-color:#2563EB;color:#e6ecf5;background:#0d1933}
+/* Summary bar */
+.summary{background:#111827;border:1px solid #1f2a44;border-radius:8px;padding:14px;margin-bottom:20px;display:none}
+.summary.visible{display:block}
+.sum-line{display:flex;justify-content:space-between;align-items:center}
+.sum-label{color:#6b7a90;font-size:13px}
+.sum-val{color:#e6ecf5;font-size:14px;font-weight:700}
+.sum-dep{color:#2563EB;font-size:13px;font-weight:600;margin-top:4px;text-align:right}
+/* Submit */
+.btn-submit{width:100%;padding:16px;background:linear-gradient(135deg,#1E40AF,#2563EB);color:#fff;border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:opacity .15s}
+.btn-submit:disabled{opacity:.4;cursor:default}
+/* Success screen */
+#success{display:none;text-align:center;padding:40px 0}
+.check-icon{width:60px;height:60px;background:#164e1a;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px}
+#success h2{color:#22c55e;font-size:22px;margin-bottom:8px}
+#success p{color:#6b7a90;font-size:14px;line-height:1.6;margin-bottom:8px}
+.new-btn{margin-top:24px;width:100%;padding:14px;background:#1f2a44;color:#2563EB;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer}
+/* Error */
+.err-bar{background:#2d0a0a;border:1px solid #7f1d1d;color:#fca5a5;padding:12px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none}
+.err-bar.visible{display:block}
+/* Section label */
+.section-label{color:#c8d3e2;font-size:14px;font-weight:600;margin-bottom:10px}
+</style>
+</head>
+<body>
+
+<h1>In-Person Close</h1>
+<div class="sub">Send a payment link on the spot</div>
+
+<div id="form-view">
+  <div class="err-bar" id="err-bar"></div>
+
+  <!-- Package -->
+  <div class="field">
+    <label>Package</label>
+    <div class="pkg-grid" id="pkg-grid">
+      <div class="pkg-card" data-pkg="launch">
+        <div class="pkg-name">Launch</div>
+        <div class="pkg-price" id="p-launch">$3,000</div>
+        <div class="pkg-dep" id="d-launch">$1,500 dep</div>
+      </div>
+      <div class="pkg-card" data-pkg="growth">
+        <div class="pkg-name">Growth</div>
+        <div class="pkg-price" id="p-growth">$5,500</div>
+        <div class="pkg-dep" id="d-growth">$2,750 dep</div>
+      </div>
+      <div class="pkg-card" data-pkg="enterprise">
+        <div class="pkg-name">Enterprise</div>
+        <div class="pkg-price" id="p-enterprise">$9,500</div>
+        <div class="pkg-dep" id="d-enterprise">$4,750 dep</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Platform -->
+  <div class="field">
+    <label>Platform</label>
+    <div class="toggle-row">
+      <div class="toggle-btn active" id="btn-ios" onclick="setPlatform('ios')">iOS Only</div>
+      <div class="toggle-btn" id="btn-dual" onclick="setPlatform('dual')">iOS + Android</div>
+    </div>
+  </div>
+
+  <!-- Selected summary -->
+  <div class="summary" id="summary">
+    <div class="sum-line">
+      <span class="sum-label">Package</span>
+      <span class="sum-val" id="sum-pkg">—</span>
+    </div>
+    <div class="sum-dep" id="sum-dep">Deposit: —</div>
+  </div>
+
+  <!-- Contact info -->
+  <div class="section-label">Prospect Info</div>
+
+  <div class="field">
+    <label>First Name</label>
+    <input type="text" id="fname" placeholder="Marcus" autocomplete="given-name">
+  </div>
+  <div class="field">
+    <label>Business Name</label>
+    <input type="text" id="biz" placeholder="Cut & Style Barbershop" autocomplete="organization">
+  </div>
+  <div class="field">
+    <label>Email</label>
+    <input type="email" id="email" placeholder="owner@business.com" inputmode="email" autocomplete="email">
+  </div>
+  <div class="field">
+    <label>Phone <span style="color:#4a5568;font-weight:400">(optional)</span></label>
+    <input type="tel" id="phone" placeholder="(555) 000-0000" inputmode="tel" autocomplete="tel">
+    <div class="hint">Used for follow-up only. Payment link goes to email.</div>
+  </div>
+
+  <!-- Payment type -->
+  <div class="field">
+    <label>Charge</label>
+    <div class="toggle-row">
+      <div class="toggle-btn active" id="btn-dep" onclick="setPayment('deposit')">50% Deposit</div>
+      <div class="toggle-btn" id="btn-full" onclick="setPayment('full')">Full Payment</div>
+    </div>
+  </div>
+
+  <button class="btn-submit" id="submit-btn" onclick="submitClose()">Send Payment Link</button>
+</div>
+
+<div id="success">
+  <div class="check-icon">&#10003;</div>
+  <h2>Payment Link Sent</h2>
+  <p id="success-msg">Link sent to their email.</p>
+  <p id="success-amount" style="color:#2563EB;font-size:18px;font-weight:700;margin-top:8px"></p>
+  <button class="new-btn" onclick="resetForm()">Close Another</button>
+</div>
+
+<script>
+const API = "https://dhriiwtpsaorqlxiuayu.supabase.co/functions/v1/capture-inperson-lead";
+const ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRocmlpd3Rwc2FvcnFseGl1YXl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc1MDQ3MDAsImV4cCI6MjA4MzA4MDcwMH0.l_-EJXZbxua0NZxaw8FnFM_S-JDCwagObFhXNQ4GKzM";
+
+const PRICES = {
+  launch:          { ios: 300000,  dual: 600000  },
+  growth:          { ios: 550000,  dual: 1100000 },
+  enterprise:      { ios: 950000,  dual: 1900000 },
+};
+
+let selectedPkg = null;
+let platform = "ios";
+let paymentType = "deposit";
+
+function fmt(cents) {
+  return "$" + (cents / 100).toLocaleString("en-US");
+}
+
+function getPackageKey() {
+  if (!selectedPkg) return null;
+  return platform === "dual" ? selectedPkg + "_dual" : selectedPkg;
+}
+
+function getTotal() {
+  if (!selectedPkg) return 0;
+  return PRICES[selectedPkg][platform];
+}
+
+function updatePrices() {
+  ["launch","growth","enterprise"].forEach(p => {
+    const total = PRICES[p][platform];
+    document.getElementById("p-" + p).textContent = fmt(total);
+    document.getElementById("d-" + p).textContent = fmt(Math.floor(total / 2)) + " dep";
+  });
+  updateSummary();
+}
+
+function updateSummary() {
+  const sum = document.getElementById("summary");
+  if (!selectedPkg) { sum.classList.remove("visible"); return; }
+  sum.classList.add("visible");
+  const total = getTotal();
+  const dep = Math.floor(total / 2);
+  const pkgLabel = selectedPkg.charAt(0).toUpperCase() + selectedPkg.slice(1) + (platform === "dual" ? " Dual (iOS + Android)" : " (iOS)");
+  document.getElementById("sum-pkg").textContent = pkgLabel + " — " + fmt(total);
+  document.getElementById("sum-dep").textContent = "Deposit: " + fmt(dep) + "  |  Full: " + fmt(total);
+}
+
+function setPlatform(p) {
+  platform = p;
+  document.getElementById("btn-ios").classList.toggle("active", p === "ios");
+  document.getElementById("btn-dual").classList.toggle("active", p === "dual");
+  updatePrices();
+}
+
+function setPayment(t) {
+  paymentType = t;
+  document.getElementById("btn-dep").classList.toggle("active", t === "deposit");
+  document.getElementById("btn-full").classList.toggle("active", t === "full");
+}
+
+document.getElementById("pkg-grid").addEventListener("click", function(e) {
+  const card = e.target.closest(".pkg-card");
+  if (!card) return;
+  selectedPkg = card.dataset.pkg;
+  document.querySelectorAll(".pkg-card").forEach(c => c.classList.remove("active"));
+  card.classList.add("active");
+  updateSummary();
+});
+
+function showErr(msg) {
+  const bar = document.getElementById("err-bar");
+  bar.textContent = msg;
+  bar.classList.add("visible");
+  bar.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+function clearErr() {
+  document.getElementById("err-bar").classList.remove("visible");
+}
+
+async function submitClose() {
+  clearErr();
+  const fname = document.getElementById("fname").value.trim();
+  const biz   = document.getElementById("biz").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+
+  if (!selectedPkg)  return showErr("Select a package.");
+  if (!fname)        return showErr("Enter the prospect's first name.");
+  if (!biz)          return showErr("Enter the business name.");
+  if (!email)        return showErr("Enter the prospect's email.");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showErr("Enter a valid email address.");
+
+  const btn = document.getElementById("submit-btn");
+  btn.disabled = true;
+  btn.textContent = "Sending...";
+
+  try {
+    const res = await fetch(API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "apikey": ANON, "Authorization": "Bearer " + ANON },
+      body: JSON.stringify({
+        business_name:      biz,
+        contact_first_name: fname,
+        email,
+        phone:              phone || undefined,
+        package_type:       getPackageKey(),
+        payment_type:       paymentType,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      showErr(data.error || data.reason || "Something went wrong. Try again.");
+      btn.disabled = false;
+      btn.textContent = "Send Payment Link";
+      return;
+    }
+
+    // Success
+    const total = getTotal();
+    const charge = paymentType === "deposit" ? Math.floor(total / 2) : total;
+    document.getElementById("success-msg").textContent = "Link sent to " + email;
+    document.getElementById("success-amount").textContent = fmt(charge * 100 / 100) + " — " + (paymentType === "deposit" ? "50% Deposit" : "Full Payment");
+    document.getElementById("form-view").style.display = "none";
+    document.getElementById("success").style.display = "block";
+    window.scrollTo(0, 0);
+
+  } catch (e) {
+    showErr("Network error. Check connection and try again.");
+    btn.disabled = false;
+    btn.textContent = "Send Payment Link";
+  }
+}
+
+function resetForm() {
+  document.getElementById("form-view").style.display = "block";
+  document.getElementById("success").style.display = "none";
+  document.getElementById("fname").value = "";
+  document.getElementById("biz").value = "";
+  document.getElementById("email").value = "";
+  document.getElementById("phone").value = "";
+  selectedPkg = null;
+  platform = "ios";
+  paymentType = "deposit";
+  document.querySelectorAll(".pkg-card").forEach(c => c.classList.remove("active"));
+  document.getElementById("summary").classList.remove("visible");
+  document.getElementById("btn-ios").classList.add("active");
+  document.getElementById("btn-dual").classList.remove("active");
+  document.getElementById("btn-dep").classList.add("active");
+  document.getElementById("btn-full").classList.remove("active");
+  document.getElementById("submit-btn").disabled = false;
+  document.getElementById("submit-btn").textContent = "Send Payment Link";
+  updatePrices();
+  clearErr();
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
