@@ -15,6 +15,10 @@ input:focus{border-color:#2563EB}
 input::placeholder{color:#374151}
 .field{margin-bottom:16px}
 .hint{color:#4a5568;font-size:12px;margin-top:5px}
+/* Product type tabs */
+.type-tabs{display:flex;gap:0;margin-bottom:24px;border:2px solid #1f2a44;border-radius:10px;overflow:hidden}
+.type-tab{flex:1;padding:12px;background:#111827;color:#6b7a90;font-size:14px;font-weight:700;cursor:pointer;text-align:center;transition:all .15s;border:none}
+.type-tab.active{background:#0d1933;color:#e6ecf5;border-bottom:2px solid #2563EB}
 /* Package selector */
 .pkg-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
 .pkg-card{background:#111827;border:2px solid #1f2a44;border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;user-select:none}
@@ -22,6 +26,15 @@ input::placeholder{color:#374151}
 .pkg-name{font-size:13px;font-weight:700;color:#e6ecf5;margin-bottom:4px}
 .pkg-price{font-size:12px;color:#2563EB;font-weight:600}
 .pkg-dep{font-size:11px;color:#6b7a90;margin-top:2px}
+/* Receptionist card */
+.rec-card{background:#111827;border:2px solid #1f2a44;border-radius:10px;padding:16px;margin-bottom:8px;cursor:pointer;transition:border-color .15s,background .15s;user-select:none}
+.rec-card.active{border-color:#2563EB;background:#0d1933}
+.rec-top{display:flex;justify-content:space-between;align-items:flex-start}
+.rec-name{font-size:15px;font-weight:700;color:#e6ecf5;margin-bottom:4px}
+.rec-tagline{font-size:12px;color:#6b7a90;line-height:1.5}
+.rec-price-block{text-align:right;white-space:nowrap}
+.rec-price{font-size:17px;color:#2563EB;font-weight:700}
+.rec-cycle{font-size:11px;color:#6b7a90}
 /* Platform toggle */
 .toggle-row{display:flex;gap:8px;margin-bottom:24px}
 .toggle-btn{flex:1;padding:10px;border:2px solid #1f2a44;border-radius:8px;background:#111827;color:#6b7a90;font-size:13px;font-weight:600;cursor:pointer;text-align:center;transition:all .15s}
@@ -32,11 +45,11 @@ input::placeholder{color:#374151}
 .sum-line{display:flex;justify-content:space-between;align-items:center}
 .sum-label{color:#6b7a90;font-size:13px}
 .sum-val{color:#e6ecf5;font-size:14px;font-weight:700}
-.sum-dep{color:#2563EB;font-size:13px;font-weight:600;margin-top:4px;text-align:right}
+.sum-sub{color:#2563EB;font-size:13px;font-weight:600;margin-top:4px;text-align:right}
 /* Submit */
 .btn-submit{width:100%;padding:16px;background:linear-gradient(135deg,#1E40AF,#2563EB);color:#fff;border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:opacity .15s}
 .btn-submit:disabled{opacity:.4;cursor:default}
-/* Success screen */
+/* Success */
 #success{display:none;text-align:center;padding:40px 0}
 .check-icon{width:60px;height:60px;background:#164e1a;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px}
 #success h2{color:#22c55e;font-size:22px;margin-bottom:8px}
@@ -45,8 +58,8 @@ input::placeholder{color:#374151}
 /* Error */
 .err-bar{background:#2d0a0a;border:1px solid #7f1d1d;color:#fca5a5;padding:12px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none}
 .err-bar.visible{display:block}
-/* Section label */
 .section-label{color:#c8d3e2;font-size:14px;font-weight:600;margin-bottom:10px}
+.hidden{display:none}
 </style>
 </head>
 <body>
@@ -57,44 +70,72 @@ input::placeholder{color:#374151}
 <div id="form-view">
   <div class="err-bar" id="err-bar"></div>
 
-  <!-- Package -->
+  <!-- Product type -->
   <div class="field">
-    <label>Package</label>
-    <div class="pkg-grid" id="pkg-grid">
-      <div class="pkg-card" data-pkg="launch">
-        <div class="pkg-name">Launch</div>
-        <div class="pkg-price" id="p-launch">$3,000</div>
-        <div class="pkg-dep" id="d-launch">$1,500 dep</div>
+    <label>Product</label>
+    <div class="type-tabs">
+      <div class="type-tab active" id="tab-app" onclick="setProductType('app')">Mobile App</div>
+      <div class="type-tab" id="tab-rec" onclick="setProductType('receptionist')">AI Receptionist</div>
+    </div>
+  </div>
+
+  <!-- APP: package grid -->
+  <div id="app-section">
+    <div class="field">
+      <label>Package</label>
+      <div class="pkg-grid" id="pkg-grid">
+        <div class="pkg-card" data-pkg="launch">
+          <div class="pkg-name">Launch</div>
+          <div class="pkg-price" id="p-launch">$3,000</div>
+          <div class="pkg-dep" id="d-launch">$1,500 dep</div>
+        </div>
+        <div class="pkg-card" data-pkg="growth">
+          <div class="pkg-name">Growth</div>
+          <div class="pkg-price" id="p-growth">$5,500</div>
+          <div class="pkg-dep" id="d-growth">$2,750 dep</div>
+        </div>
+        <div class="pkg-card" data-pkg="enterprise">
+          <div class="pkg-name">Enterprise</div>
+          <div class="pkg-price" id="p-enterprise">$9,500</div>
+          <div class="pkg-dep" id="d-enterprise">$4,750 dep</div>
+        </div>
       </div>
-      <div class="pkg-card" data-pkg="growth">
-        <div class="pkg-name">Growth</div>
-        <div class="pkg-price" id="p-growth">$5,500</div>
-        <div class="pkg-dep" id="d-growth">$2,750 dep</div>
-      </div>
-      <div class="pkg-card" data-pkg="enterprise">
-        <div class="pkg-name">Enterprise</div>
-        <div class="pkg-price" id="p-enterprise">$9,500</div>
-        <div class="pkg-dep" id="d-enterprise">$4,750 dep</div>
+    </div>
+    <div class="field">
+      <label>Platform</label>
+      <div class="toggle-row">
+        <div class="toggle-btn active" id="btn-ios" onclick="setPlatform('ios')">iOS Only</div>
+        <div class="toggle-btn" id="btn-dual" onclick="setPlatform('dual')">iOS + Android</div>
       </div>
     </div>
   </div>
 
-  <!-- Platform -->
-  <div class="field">
-    <label>Platform</label>
-    <div class="toggle-row">
-      <div class="toggle-btn active" id="btn-ios" onclick="setPlatform('ios')">iOS Only</div>
-      <div class="toggle-btn" id="btn-dual" onclick="setPlatform('dual')">iOS + Android</div>
+  <!-- RECEPTIONIST: single card -->
+  <div id="rec-section" class="hidden">
+    <div class="field">
+      <label>Plan</label>
+      <div class="rec-card active" id="rec-card">
+        <div class="rec-top">
+          <div>
+            <div class="rec-name">AI Receptionist</div>
+            <div class="rec-tagline">Answers calls 24/7. Books appointments.<br>Handles FAQs. No staff needed.</div>
+          </div>
+          <div class="rec-price-block">
+            <div class="rec-price">$497</div>
+            <div class="rec-cycle">/month</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Selected summary -->
+  <!-- Summary -->
   <div class="summary" id="summary">
     <div class="sum-line">
-      <span class="sum-label">Package</span>
+      <span class="sum-label" id="sum-label">Package</span>
       <span class="sum-val" id="sum-pkg">—</span>
     </div>
-    <div class="sum-dep" id="sum-dep">Deposit: —</div>
+    <div class="sum-sub" id="sum-sub"></div>
   </div>
 
   <!-- Contact info -->
@@ -118,72 +159,44 @@ input::placeholder{color:#374151}
     <div class="hint">Used for follow-up only. Payment link goes to email.</div>
   </div>
 
-  <!-- Payment type -->
-  <div class="field">
-    <label>Charge</label>
-    <div class="toggle-row">
-      <div class="toggle-btn active" id="btn-dep" onclick="setPayment('deposit')">50% Deposit</div>
-      <div class="toggle-btn" id="btn-full" onclick="setPayment('full')">Full Payment</div>
-    </div>
-  </div>
-
   <button class="btn-submit" id="submit-btn" onclick="submitClose()">Send Payment Link</button>
 </div>
 
 <div id="success">
   <div class="check-icon">&#10003;</div>
   <h2>Payment Link Sent</h2>
-  <p id="success-msg">Link sent to their email.</p>
+  <p id="success-msg"></p>
   <p id="success-amount" style="color:#2563EB;font-size:18px;font-weight:700;margin-top:8px"></p>
   <button class="new-btn" onclick="resetForm()">Close Another</button>
 </div>
 
 <script>
-const API = "https://dhriiwtpsaorqlxiuayu.supabase.co/functions/v1/capture-inperson-lead";
+const API  = "https://dhriiwtpsaorqlxiuayu.supabase.co/functions/v1/capture-inperson-lead";
 const ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRocmlpd3Rwc2FvcnFseGl1YXl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc1MDQ3MDAsImV4cCI6MjA4MzA4MDcwMH0.l_-EJXZbxua0NZxaw8FnFM_S-JDCwagObFhXNQ4GKzM";
 
-const PRICES = {
-  launch:          { ios: 300000,  dual: 600000  },
-  growth:          { ios: 550000,  dual: 1100000 },
-  enterprise:      { ios: 950000,  dual: 1900000 },
+const APP_PRICES = {
+  launch:     { ios: 300000,  dual: 600000  },
+  growth:     { ios: 550000,  dual: 1100000 },
+  enterprise: { ios: 950000,  dual: 1900000 },
 };
 
-let selectedPkg = null;
-let platform = "ios";
-let paymentType = "deposit";
+let productType = "app";   // "app" | "receptionist"
+let selectedPkg = null;    // "launch" | "growth" | "enterprise"
+let platform    = "ios";   // "ios" | "dual"
 
 function fmt(cents) {
   return "$" + (cents / 100).toLocaleString("en-US");
 }
 
-function getPackageKey() {
-  if (!selectedPkg) return null;
-  return platform === "dual" ? selectedPkg + "_dual" : selectedPkg;
-}
-
-function getTotal() {
-  if (!selectedPkg) return 0;
-  return PRICES[selectedPkg][platform];
-}
-
-function updatePrices() {
-  ["launch","growth","enterprise"].forEach(p => {
-    const total = PRICES[p][platform];
-    document.getElementById("p-" + p).textContent = fmt(total);
-    document.getElementById("d-" + p).textContent = fmt(Math.floor(total / 2)) + " dep";
-  });
+function setProductType(t) {
+  productType = t;
+  document.getElementById("tab-app").classList.toggle("active", t === "app");
+  document.getElementById("tab-rec").classList.toggle("active", t === "receptionist");
+  document.getElementById("app-section").classList.toggle("hidden", t !== "app");
+  document.getElementById("rec-section").classList.toggle("hidden", t !== "receptionist");
+  selectedPkg = (t === "receptionist") ? "receptionist" : null;
+  document.querySelectorAll(".pkg-card").forEach(c => c.classList.remove("active"));
   updateSummary();
-}
-
-function updateSummary() {
-  const sum = document.getElementById("summary");
-  if (!selectedPkg) { sum.classList.remove("visible"); return; }
-  sum.classList.add("visible");
-  const total = getTotal();
-  const dep = Math.floor(total / 2);
-  const pkgLabel = selectedPkg.charAt(0).toUpperCase() + selectedPkg.slice(1) + (platform === "dual" ? " Dual (iOS + Android)" : " (iOS)");
-  document.getElementById("sum-pkg").textContent = pkgLabel + " — " + fmt(total);
-  document.getElementById("sum-dep").textContent = "Deposit: " + fmt(dep) + "  |  Full: " + fmt(total);
 }
 
 function setPlatform(p) {
@@ -193,10 +206,35 @@ function setPlatform(p) {
   updatePrices();
 }
 
-function setPayment(t) {
-  paymentType = t;
-  document.getElementById("btn-dep").classList.toggle("active", t === "deposit");
-  document.getElementById("btn-full").classList.toggle("active", t === "full");
+function updatePrices() {
+  ["launch","growth","enterprise"].forEach(p => {
+    const total = APP_PRICES[p][platform];
+    document.getElementById("p-" + p).textContent = fmt(total);
+    document.getElementById("d-" + p).textContent = fmt(Math.floor(total / 2)) + " dep";
+  });
+  updateSummary();
+}
+
+function updateSummary() {
+  const sum = document.getElementById("summary");
+
+  if (productType === "receptionist") {
+    sum.classList.add("visible");
+    document.getElementById("sum-label").textContent = "Plan";
+    document.getElementById("sum-pkg").textContent = "AI Receptionist";
+    document.getElementById("sum-sub").textContent = "$497 / month — billed monthly";
+    return;
+  }
+
+  if (!selectedPkg) { sum.classList.remove("visible"); return; }
+  sum.classList.add("visible");
+  const total = APP_PRICES[selectedPkg][platform];
+  const dep   = Math.floor(total / 2);
+  const label = selectedPkg.charAt(0).toUpperCase() + selectedPkg.slice(1)
+              + (platform === "dual" ? " Dual (iOS + Android)" : " (iOS)");
+  document.getElementById("sum-label").textContent = "Package";
+  document.getElementById("sum-pkg").textContent = label + " — " + fmt(total);
+  document.getElementById("sum-sub").textContent = "50% deposit today: " + fmt(dep);
 }
 
 document.getElementById("pkg-grid").addEventListener("click", function(e) {
@@ -207,6 +245,12 @@ document.getElementById("pkg-grid").addEventListener("click", function(e) {
   card.classList.add("active");
   updateSummary();
 });
+
+function getPackageKey() {
+  if (productType === "receptionist") return "receptionist";
+  if (!selectedPkg) return null;
+  return platform === "dual" ? selectedPkg + "_dual" : selectedPkg;
+}
 
 function showErr(msg) {
   const bar = document.getElementById("err-bar");
@@ -224,11 +268,12 @@ async function submitClose() {
   const biz   = document.getElementById("biz").value.trim();
   const email = document.getElementById("email").value.trim();
   const phone = document.getElementById("phone").value.trim();
+  const pkg   = getPackageKey();
 
-  if (!selectedPkg)  return showErr("Select a package.");
-  if (!fname)        return showErr("Enter the prospect's first name.");
-  if (!biz)          return showErr("Enter the business name.");
-  if (!email)        return showErr("Enter the prospect's email.");
+  if (!pkg)   return showErr("Select a package.");
+  if (!fname) return showErr("Enter the prospect's first name.");
+  if (!biz)   return showErr("Enter the business name.");
+  if (!email) return showErr("Enter the prospect's email.");
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showErr("Enter a valid email address.");
 
   const btn = document.getElementById("submit-btn");
@@ -244,13 +289,11 @@ async function submitClose() {
         contact_first_name: fname,
         email,
         phone:              phone || undefined,
-        package_type:       getPackageKey(),
-        payment_type:       paymentType,
+        package_type:       pkg,
       }),
     });
 
     const data = await res.json();
-
     if (!res.ok || !data.success) {
       showErr(data.error || data.reason || "Something went wrong. Try again.");
       btn.disabled = false;
@@ -258,11 +301,8 @@ async function submitClose() {
       return;
     }
 
-    // Success
-    const total = getTotal();
-    const charge = paymentType === "deposit" ? Math.floor(total / 2) : total;
     document.getElementById("success-msg").textContent = "Link sent to " + email;
-    document.getElementById("success-amount").textContent = fmt(charge * 100 / 100) + " — " + (paymentType === "deposit" ? "50% Deposit" : "Full Payment");
+    document.getElementById("success-amount").textContent = data.amount_display;
     document.getElementById("form-view").style.display = "none";
     document.getElementById("success").style.display = "block";
     window.scrollTo(0, 0);
@@ -277,22 +317,21 @@ async function submitClose() {
 function resetForm() {
   document.getElementById("form-view").style.display = "block";
   document.getElementById("success").style.display = "none";
-  document.getElementById("fname").value = "";
-  document.getElementById("biz").value = "";
-  document.getElementById("email").value = "";
-  document.getElementById("phone").value = "";
+  ["fname","biz","email","phone"].forEach(id => document.getElementById(id).value = "");
+  productType = "app";
   selectedPkg = null;
-  platform = "ios";
-  paymentType = "deposit";
+  platform    = "ios";
+  document.getElementById("tab-app").classList.add("active");
+  document.getElementById("tab-rec").classList.remove("active");
+  document.getElementById("app-section").classList.remove("hidden");
+  document.getElementById("rec-section").classList.add("hidden");
   document.querySelectorAll(".pkg-card").forEach(c => c.classList.remove("active"));
-  document.getElementById("summary").classList.remove("visible");
   document.getElementById("btn-ios").classList.add("active");
   document.getElementById("btn-dual").classList.remove("active");
-  document.getElementById("btn-dep").classList.add("active");
-  document.getElementById("btn-full").classList.remove("active");
-  document.getElementById("submit-btn").disabled = false;
-  document.getElementById("submit-btn").textContent = "Send Payment Link";
-  updatePrices();
+  document.getElementById("summary").classList.remove("visible");
+  btn = document.getElementById("submit-btn");
+  btn.disabled = false;
+  btn.textContent = "Send Payment Link";
   clearErr();
   window.scrollTo(0, 0);
 }
