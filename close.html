@@ -87,17 +87,17 @@ input::placeholder{color:#374151}
         <div class="pkg-card" data-pkg="launch">
           <div class="pkg-name">Launch</div>
           <div class="pkg-price" id="p-launch">$3,000</div>
-          <div class="pkg-dep" id="d-launch">$1,500 dep</div>
+          <div class="pkg-dep" id="d-launch">iOS only</div>
         </div>
         <div class="pkg-card" data-pkg="growth">
           <div class="pkg-name">Growth</div>
           <div class="pkg-price" id="p-growth">$5,500</div>
-          <div class="pkg-dep" id="d-growth">$2,750 dep</div>
+          <div class="pkg-dep" id="d-growth">iOS only</div>
         </div>
         <div class="pkg-card" data-pkg="enterprise">
           <div class="pkg-name">Enterprise</div>
           <div class="pkg-price" id="p-enterprise">$9,500</div>
-          <div class="pkg-dep" id="d-enterprise">$4,750 dep</div>
+          <div class="pkg-dep" id="d-enterprise">iOS only</div>
         </div>
       </div>
     </div>
@@ -209,9 +209,8 @@ function setPlatform(p) {
 
 function updatePrices() {
   ["launch","growth","enterprise"].forEach(p => {
-    const total = APP_PRICES[p][platform];
-    document.getElementById("p-" + p).textContent = fmt(total);
-    document.getElementById("d-" + p).textContent = fmt(Math.floor(total / 2)) + " dep";
+    document.getElementById("p-" + p).textContent = fmt(APP_PRICES[p][platform]);
+    document.getElementById("d-" + p).textContent = platform === "dual" ? "iOS + Android" : "iOS only";
   });
   updateSummary();
 }
@@ -230,12 +229,11 @@ function updateSummary() {
   if (!selectedPkg) { sum.classList.remove("visible"); return; }
   sum.classList.add("visible");
   const total = APP_PRICES[selectedPkg][platform];
-  const dep   = Math.floor(total / 2);
   const label = selectedPkg.charAt(0).toUpperCase() + selectedPkg.slice(1)
               + (platform === "dual" ? " Dual (iOS + Android)" : " (iOS)");
   document.getElementById("sum-label").textContent = "Package";
-  document.getElementById("sum-pkg").textContent = label + " — " + fmt(total);
-  document.getElementById("sum-sub").textContent = "50% deposit today: " + fmt(dep);
+  document.getElementById("sum-pkg").textContent = label;
+  document.getElementById("sum-sub").textContent = "Full payment: " + fmt(total);
 }
 
 document.getElementById("pkg-grid").addEventListener("click", function(e) {
