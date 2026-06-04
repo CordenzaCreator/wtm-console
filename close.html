@@ -316,6 +316,17 @@ async function submitClose() {
   }
 }
 
+// Pre-fill business name when navigating from demo.html (?biz=)
+(function(){
+  const bizParam = new URLSearchParams(window.location.search).get("biz");
+  if(bizParam){
+    const el = document.getElementById("biz");
+    if(el) el.value = decodeURIComponent(bizParam);
+    const tab = document.getElementById("tab-rec");
+    if(tab) { tab.click(); }
+  }
+})();
+
 function resetForm() {
   document.getElementById("form-view").style.display = "block";
   document.getElementById("success").style.display = "none";

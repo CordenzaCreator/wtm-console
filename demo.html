@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="WTM Demo">
+<title>WTM — AI Receptionist Demo</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:-apple-system,system-ui,sans-serif;
+  background:#0a0e1a;color:#e6ecf5;
+  padding:20px 16px calc(env(safe-area-inset-bottom,20px) + 40px);
+  padding-top:calc(env(safe-area-inset-top,0px) + 20px);
+  max-width:480px;margin:0 auto;
+}
+/* Header */
+.hdr{text-align:center;margin-bottom:24px}
+.logo-img{height:44px;width:auto;display:block;margin:0 auto 8px}
+h1{color:#2563EB;font-size:18px;font-weight:700;margin-bottom:2px}
+.sub{color:#6b7a90;font-size:13px}
+/* Nav link back to close */
+.nav-link{display:inline-block;color:#4a5568;font-size:12px;text-decoration:none;margin-bottom:20px;padding:6px 0}
+.nav-link:active{opacity:.7}
+/* Labels + inputs */
+label{display:block;color:#6b7a90;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+input,select{
+  width:100%;background:#111827;border:1px solid #1f2a44;border-radius:8px;
+  padding:14px;color:#e6ecf5;font-size:16px;outline:none;
+  transition:border-color .15s;-webkit-appearance:none;appearance:none;
+}
+input:focus,select:focus{border-color:#2563EB}
+input::placeholder{color:#374151}
+select option{background:#111827;color:#e6ecf5}
+.field{margin-bottom:16px}
+.hint{color:#4a5568;font-size:12px;margin-top:5px}
+/* Service rows */
+.svc-row{display:flex;gap:8px}
+.svc-row input:first-child{flex:1.8}
+.svc-row input:last-child{flex:1}
+/* Section divider */
+.section{color:#4a5568;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin:20px 0 14px;border-top:1px solid #1a2236;padding-top:16px}
+/* Buttons */
+.btn{
+  width:100%;padding:16px;border:none;border-radius:10px;
+  font-size:17px;font-weight:700;cursor:pointer;
+  letter-spacing:.3px;transition:opacity .15s,transform .1s;
+  font-family:inherit;margin-top:8px;
+}
+.btn:active:not(:disabled){transform:scale(.98);opacity:.9}
+.btn:disabled{opacity:.35;cursor:default;transform:none}
+.btn-primary{background:linear-gradient(135deg,#1E40AF,#2563EB);color:#fff}
+.btn-outline{background:transparent;border:1.5px solid #1f2a44;color:#9ca3af;margin-top:12px}
+/* Status */
+.status-bar{
+  margin-top:14px;font-size:14px;text-align:center;
+  color:#6b7a90;min-height:20px;
+}
+.status-bar.err{color:#f87171}
+/* Error bar */
+.err-bar{
+  background:#2d0a0a;border:1px solid #7f1d1d;color:#fca5a5;
+  padding:12px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none;
+}
+.err-bar.visible{display:block}
+/* Result card */
+.result-card{
+  background:#0d1f13;border:1.5px solid #166534;border-radius:12px;
+  padding:24px;margin-top:20px;display:none;text-align:center;
+}
+.result-card.show{display:block}
+.result-label{color:#4ade80;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.phone-number{
+  font-size:36px;font-weight:800;color:#fff;letter-spacing:.5px;
+  text-decoration:none;display:block;margin-bottom:4px;
+}
+.phone-number:active{opacity:.75}
+.phone-hint{color:#6b7a90;font-size:13px;margin-bottom:20px}
+.biz-name-display{color:#9ca3af;font-size:14px;margin-bottom:4px;font-weight:500}
+/* Action row in result */
+.action-row{display:flex;gap:8px;margin-top:4px}
+.action-btn{
+  flex:1;padding:13px 8px;border-radius:9px;border:none;
+  font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;
+  transition:opacity .15s;min-height:46px;
+}
+.action-btn:active{opacity:.8}
+.action-primary{background:#2563EB;color:#fff}
+.action-outline{background:transparent;border:1.5px solid #1f2a44;color:#9ca3af}
+.action-green{background:#166534;color:#4ade80}
+/* Toast */
+.toast{
+  position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
+  background:#2563EB;color:#fff;padding:10px 22px;border-radius:9px;
+  font-size:14px;font-weight:600;opacity:0;transition:opacity .25s;
+  pointer-events:none;z-index:100;white-space:nowrap;
+}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <img src="logo.png" alt="WebToMobilePro" class="logo-img">
+  <h1>AI Receptionist Demo</h1>
+  <div class="sub">Set up a live demo for the business you are pitching</div>
+</div>
+
+<a href="close.html" class="nav-link">← Back to Close</a>
+
+<div id="form-view">
+  <div class="err-bar" id="err-bar"></div>
+
+  <!-- Business Info -->
+  <div class="field">
+    <label>Business Name *</label>
+    <input type="text" id="biz-name" placeholder="e.g. King's Barbershop" autocapitalize="words" autocorrect="off">
+  </div>
+
+  <div class="field">
+    <label>Business Type *</label>
+    <select id="biz-type">
+      <option value="">Select type...</option>
+      <option value="barbershop">Barbershop</option>
+      <option value="hair_salon">Hair Salon</option>
+      <option value="nail_salon">Nail Salon</option>
+      <option value="gym">Gym / Fitness</option>
+      <option value="restaurant">Restaurant</option>
+      <option value="spa">Spa / Massage</option>
+      <option value="dental">Dental Office</option>
+      <option value="auto_shop">Auto Shop</option>
+      <option value="generic">Other / General</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Business Website <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+    <input type="url" id="biz-website" placeholder="https://their-website.com" autocapitalize="none" autocorrect="off" inputmode="url">
+    <div class="hint">Saved for your records. Auto-fill coming soon.</div>
+  </div>
+
+  <!-- Call Details -->
+  <div class="section">Call Details</div>
+
+  <div class="field">
+    <label>Most common thing customers call about</label>
+    <select id="call-reason">
+      <option value="">Not sure / General</option>
+      <option value="Booking an appointment">Booking an appointment</option>
+      <option value="Pricing">Pricing</option>
+      <option value="Hours">Hours</option>
+      <option value="Availability">Availability</option>
+      <option value="Reservations">Reservations</option>
+      <option value="Estimates">Estimates</option>
+      <option value="Services offered">Services offered</option>
+    </select>
+    <div class="hint">The AI will emphasize handling this in the demo call.</div>
+  </div>
+
+  <div class="field">
+    <label>Business Hours <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+    <input type="text" id="biz-hours" placeholder="e.g. Mon–Sat 9am–6pm, closed Sunday" autocapitalize="words">
+    <div class="hint">Leave blank and the AI will handle it honestly.</div>
+  </div>
+
+  <!-- Services -->
+  <div class="section">Services <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional — 3 max)</span></div>
+
+  <div class="field">
+    <label>Service 1</label>
+    <div class="svc-row">
+      <input type="text" id="svc1" placeholder="e.g. Haircut" autocapitalize="words">
+      <input type="text" id="svc1-price" placeholder="$30" autocapitalize="none">
+    </div>
+  </div>
+  <div class="field">
+    <label>Service 2</label>
+    <div class="svc-row">
+      <input type="text" id="svc2" placeholder="e.g. Beard Trim" autocapitalize="words">
+      <input type="text" id="svc2-price" placeholder="$15" autocapitalize="none">
+    </div>
+  </div>
+  <div class="field">
+    <label>Service 3</label>
+    <div class="svc-row">
+      <input type="text" id="svc3" placeholder="e.g. Shape-Up" autocapitalize="words">
+      <input type="text" id="svc3-price" placeholder="$20" autocapitalize="none">
+    </div>
+  </div>
+
+  <!-- Personalization -->
+  <div class="section">Personalization</div>
+
+  <div class="field">
+    <label>Owner / Manager First Name <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+    <input type="text" id="owner-name" placeholder="e.g. Marcus" autocapitalize="words">
+    <div class="hint">AI will say "I'll make sure Marcus has this" instead of "the team."</div>
+  </div>
+
+  <div class="field">
+    <label>Demo Agent Name</label>
+    <input type="text" id="agent-name" placeholder="Alex" autocapitalize="words" value="Alex">
+  </div>
+
+  <button class="btn btn-primary" id="preload-btn" onclick="preload()">Preload Demo</button>
+  <div class="status-bar" id="status-bar"></div>
+</div>
+
+<!-- Result card (shown after successful preload) -->
+<div class="result-card" id="result-card">
+  <div class="result-label">Demo Ready</div>
+  <div class="biz-name-display" id="result-biz-name"></div>
+  <a class="phone-number" id="call-link" href="#">—</a>
+  <div class="phone-hint">Hand them your phone and have them call this number</div>
+
+  <div class="action-row">
+    <button class="action-btn action-primary" onclick="copyPhone()">Copy Number</button>
+    <button class="action-btn action-green" onclick="convertToLead()">Convert to Lead</button>
+    <button class="action-btn action-outline" onclick="resetForm()">Reset</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API  = "https://dhriiwtpsaorqlxiuayu.supabase.co/functions/v1/create-demo-receptionist";
+const ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRocmlpd3Rwc2FvcnFseGl1YXl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc1MDQ3MDAsImV4cCI6MjA4MzA4MDcwMH0.l_-EJXZbxua0NZxaw8FnFM_S-JDCwagObFhXNQ4GKzM";
+
+let loading = false;
+let currentPhone = "";
+let currentBizName = "";
+let currentBizType = "";
+let currentMainCallReason = "";
+
+function $(id){ return document.getElementById(id); }
+
+function showErr(msg){
+  const bar = $("err-bar");
+  bar.textContent = msg;
+  bar.classList.add("visible");
+  bar.scrollIntoView({ behavior:"smooth", block:"nearest" });
+}
+function clearErr(){ $("err-bar").classList.remove("visible"); }
+
+function setStatus(msg, isErr){
+  const bar = $("status-bar");
+  bar.textContent = msg;
+  bar.className = "status-bar" + (isErr ? " err" : "");
+}
+
+function getServices(){
+  const services = [];
+  for(let i = 1; i <= 3; i++){
+    const name  = $("svc" + i)?.value.trim();
+    const price = $("svc" + i + "-price")?.value.trim();
+    if(name) services.push(price ? `${name} – ${price}` : name);
+  }
+  return services;
+}
+
+async function preload(){
+  if(loading) return;
+
+  const bizName = $("biz-name").value.trim();
+  const bizType = $("biz-type").value;
+
+  clearErr();
+  if(!bizName){ $("biz-name").focus(); return showErr("Business name is required."); }
+  if(!bizType){ $("biz-type").focus(); return showErr("Select a business type."); }
+
+  loading = true;
+  const btn = $("preload-btn");
+  btn.disabled = true;
+  btn.textContent = "Preloading...";
+  setStatus("Configuring demo assistant...");
+
+  const payload = {
+    business_name:     bizName,
+    business_type:     bizType,
+    main_call_reason:  $("call-reason").value || undefined,
+    services:          getServices().length ? getServices() : undefined,
+    business_hours:    $("biz-hours").value.trim() || undefined,
+    owner_name:        $("owner-name").value.trim() || undefined,
+    agent_name:        $("agent-name").value.trim() || "Alex",
+    business_website:  $("biz-website").value.trim() || undefined,
+  };
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 20000);
+
+    const res = await fetch(API, {
+      method:  "POST",
+      headers: { "Content-Type":"application/json", "apikey": ANON, "Authorization":"Bearer " + ANON },
+      body:    JSON.stringify(payload),
+      signal:  controller.signal,
+    });
+    clearTimeout(timeout);
+
+    const data = await res.json();
+
+    if(!res.ok || !data.success){
+      loading = false;
+      btn.disabled = false;
+      btn.textContent = "Preload Demo";
+      setStatus("", false);
+      return showErr(data.error || "Something went wrong. Try again.");
+    }
+
+    // Success
+    currentPhone = data.demo_phone_number || "";
+    currentBizName = bizName;
+    currentBizType = bizType;
+    currentMainCallReason = $("call-reason").value || "";
+
+    const agentName = $("agent-name").value.trim() || "Alex";
+    const formatted = formatPhone(currentPhone);
+
+    $("result-biz-name").textContent = bizName;
+    $("call-link").textContent = formatted || currentPhone;
+    $("call-link").href = "tel:" + currentPhone.replace(/\D/g,"");
+
+    $("form-view").style.display = "none";
+    $("result-card").classList.add("show");
+
+    if(navigator.vibrate) navigator.vibrate(50);
+    setStatus("", false);
+
+  } catch(err){
+    loading = false;
+    btn.disabled = false;
+    btn.textContent = "Preload Demo";
+    const isTimeout = err.name === "AbortError";
+    setStatus("", false);
+    showErr(isTimeout ? "Request timed out. Check your connection and try again." : (err.message || "Connection error. Try again."));
+  }
+}
+
+function formatPhone(raw){
+  const digits = (raw || "").replace(/\D/g,"");
+  if(digits.length === 11 && digits[0] === "1"){
+    return `(${digits.slice(1,4)}) ${digits.slice(4,7)}-${digits.slice(7)}`;
+  }
+  if(digits.length === 10){
+    return `(${digits.slice(0,3)}) ${digits.slice(3,6)}-${digits.slice(6)}`;
+  }
+  return raw;
+}
+
+function copyPhone(){
+  if(!currentPhone) return;
+  const text = (currentPhone).replace(/\D/g,"");
+  navigator.clipboard?.writeText(text).then(() => {
+    showToast("Number copied");
+  }).catch(() => {
+    showToast("Tap the number to call");
+  });
+}
+
+function showToast(msg){
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2000);
+}
+
+function convertToLead(){
+  // Open close.html with biz name pre-filled via URL param
+  const params = new URLSearchParams({ biz: currentBizName });
+  window.location.href = "close.html?" + params.toString();
+}
+
+function resetForm(){
+  loading = false;
+  currentPhone = "";
+  currentBizName = "";
+  $("result-card").classList.remove("show");
+  $("form-view").style.display = "";
+  $("preload-btn").disabled = false;
+  $("preload-btn").textContent = "Preload Demo";
+  setStatus("", false);
+  clearErr();
+  // Restore focus to business name
+  setTimeout(() => $("biz-name")?.focus(), 100);
+}
+
+// Enter key on any input triggers preload
+document.addEventListener("keydown", function(e){
+  if(e.key === "Enter" && !loading) preload();
+});
+</script>
+</body>
+</html>
