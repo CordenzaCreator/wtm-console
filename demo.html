@@ -13,18 +13,22 @@ html,body{height:100%}
 body{
   font-family:-apple-system,system-ui,sans-serif;
   background:#0a0e1a;color:#e6ecf5;
-  padding:20px 16px calc(env(safe-area-inset-bottom,20px) + 40px);
+  padding:20px 16px calc(env(safe-area-inset-bottom,20px) + 48px);
   padding-top:calc(env(safe-area-inset-top,0px) + 20px);
   max-width:480px;margin:0 auto;
 }
 /* Header */
-.hdr{text-align:center;margin-bottom:24px}
+.hdr{text-align:center;margin-bottom:20px}
 .logo-img{height:44px;width:auto;display:block;margin:0 auto 8px}
 h1{color:#2563EB;font-size:18px;font-weight:700;margin-bottom:2px}
 .sub{color:#6b7a90;font-size:13px}
-/* Nav link back to close */
-.nav-link{display:inline-block;color:#4a5568;font-size:12px;text-decoration:none;margin-bottom:20px;padding:6px 0}
+/* Nav */
+.nav-link{display:inline-block;color:#4a5568;font-size:12px;text-decoration:none;margin-bottom:16px;padding:6px 0}
 .nav-link:active{opacity:.7}
+/* Mode toggle */
+.mode-tabs{display:flex;gap:0;margin-bottom:20px;background:#111827;border:1px solid #1f2a44;border-radius:9px;overflow:hidden}
+.mode-tab{flex:1;padding:11px;background:transparent;color:#6b7a90;font-size:14px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
+.mode-tab.active{background:#0d1933;color:#e6ecf5;border-bottom:2px solid #2563EB}
 /* Labels + inputs */
 label{display:block;color:#6b7a90;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
 input,select{
@@ -37,6 +41,14 @@ input::placeholder{color:#374151}
 select option{background:#111827;color:#e6ecf5}
 .field{margin-bottom:16px}
 .hint{color:#4a5568;font-size:12px;margin-top:5px}
+/* Personality pill row */
+.pill-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px}
+.pill{
+  padding:8px 14px;border-radius:20px;border:1.5px solid #1f2a44;
+  background:transparent;color:#6b7a90;font-size:13px;font-weight:600;
+  cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;
+}
+.pill.active{border-color:#2563EB;color:#e6ecf5;background:#0d1933}
 /* Service rows */
 .svc-row{display:flex;gap:8px}
 .svc-row input:first-child{flex:1.8}
@@ -53,51 +65,51 @@ select option{background:#111827;color:#e6ecf5}
 .btn:active:not(:disabled){transform:scale(.98);opacity:.9}
 .btn:disabled{opacity:.35;cursor:default;transform:none}
 .btn-primary{background:linear-gradient(135deg,#1E40AF,#2563EB);color:#fff}
-.btn-outline{background:transparent;border:1.5px solid #1f2a44;color:#9ca3af;margin-top:12px}
+.btn-ghost{background:transparent;border:1.5px solid #1f2a44;color:#6b7a90;font-size:14px;padding:12px;margin-top:8px}
 /* Status */
-.status-bar{
-  margin-top:14px;font-size:14px;text-align:center;
-  color:#6b7a90;min-height:20px;
-}
+.status-bar{margin-top:14px;font-size:14px;text-align:center;color:#6b7a90;min-height:20px}
 .status-bar.err{color:#f87171}
 /* Error bar */
-.err-bar{
-  background:#2d0a0a;border:1px solid #7f1d1d;color:#fca5a5;
-  padding:12px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none;
-}
+.err-bar{background:#2d0a0a;border:1px solid #7f1d1d;color:#fca5a5;padding:12px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none}
 .err-bar.visible{display:block}
 /* Result card */
-.result-card{
-  background:#0d1f13;border:1.5px solid #166534;border-radius:12px;
-  padding:24px;margin-top:20px;display:none;text-align:center;
-}
+.result-card{background:#0d1f13;border:1.5px solid #166534;border-radius:12px;padding:24px;margin-top:20px;display:none;text-align:center}
 .result-card.show{display:block}
 .result-label{color:#4ade80;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
-.phone-number{
-  font-size:36px;font-weight:800;color:#fff;letter-spacing:.5px;
-  text-decoration:none;display:block;margin-bottom:4px;
-}
-.phone-number:active{opacity:.75}
-.phone-hint{color:#6b7a90;font-size:13px;margin-bottom:20px}
 .biz-name-display{color:#9ca3af;font-size:14px;margin-bottom:4px;font-weight:500}
-/* Action row in result */
+.phone-number{font-size:36px;font-weight:800;color:#fff;letter-spacing:.5px;text-decoration:none;display:block;margin-bottom:4px}
+.phone-number:active{opacity:.75}
+.phone-hint{color:#6b7a90;font-size:13px;margin-bottom:16px}
+/* Reveal copy */
+.reveal-copy{border-top:1px solid #1a3020;padding-top:14px;margin-bottom:16px;text-align:left}
+.reveal-line{color:#d1fae5;font-size:14px;font-style:italic;font-weight:500;line-height:1.5;margin-bottom:8px}
+.reveal-prompt{color:#4a5568;font-size:12px;line-height:1.5;border-left:2px solid #166534;padding-left:8px}
+/* Action row */
 .action-row{display:flex;gap:8px;margin-top:4px}
-.action-btn{
-  flex:1;padding:13px 8px;border-radius:9px;border:none;
-  font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;
-  transition:opacity .15s;min-height:46px;
-}
+.action-btn{flex:1;padding:13px 8px;border-radius:9px;border:none;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;transition:opacity .15s;min-height:46px}
 .action-btn:active{opacity:.8}
 .action-primary{background:#2563EB;color:#fff}
 .action-outline{background:transparent;border:1.5px solid #1f2a44;color:#9ca3af}
 .action-green{background:#166534;color:#4ade80}
+/* Call summary card */
+.summary-card{margin-top:14px;background:#0a1628;border:1px solid #1f2a44;border-radius:10px;padding:16px;text-align:left}
+.summary-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.summary-title{color:#4ade80;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px}
+.summary-refresh{background:transparent;border:1px solid #1f2a44;color:#6b7a90;font-size:12px;font-weight:600;padding:5px 10px;border-radius:6px;cursor:pointer;font-family:inherit}
+.summary-refresh:active{opacity:.7}
+.summary-body{color:#9ca3af;font-size:13px;line-height:1.6}
+.summary-empty{color:#4a5568;font-size:13px;font-style:italic}
+.summary-field{margin-bottom:6px}
+.summary-field strong{color:#c8d3e2;font-weight:600}
+/* Stats section */
+.stats-section{margin-top:32px;padding-top:20px;border-top:1px solid #1a2236}
+.stats-title{color:#4a5568;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+.stats-row{display:flex;gap:8px}
+.stat-item{flex:1;background:#111827;border:1px solid #1f2a44;border-radius:8px;padding:14px 8px;text-align:center}
+.stat-num{font-size:24px;font-weight:800;color:#2563EB;margin-bottom:2px}
+.stat-lbl{color:#4a5568;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
 /* Toast */
-.toast{
-  position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
-  background:#2563EB;color:#fff;padding:10px 22px;border-radius:9px;
-  font-size:14px;font-weight:600;opacity:0;transition:opacity .25s;
-  pointer-events:none;z-index:100;white-space:nowrap;
-}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#2563EB;color:#fff;padding:10px 22px;border-radius:9px;font-size:14px;font-weight:600;opacity:0;transition:opacity .25s;pointer-events:none;z-index:100;white-space:nowrap}
 .toast.show{opacity:1}
 </style>
 </head>
@@ -111,10 +123,16 @@ select option{background:#111827;color:#e6ecf5}
 
 <a href="close.html" class="nav-link">← Back to Close</a>
 
+<!-- Quick / Advanced toggle -->
+<div class="mode-tabs">
+  <button class="mode-tab active" id="tab-quick"    onclick="setMode('quick')">Quick Demo</button>
+  <button class="mode-tab"        id="tab-advanced" onclick="setMode('advanced')">Advanced Demo</button>
+</div>
+
 <div id="form-view">
   <div class="err-bar" id="err-bar"></div>
 
-  <!-- Business Info -->
+  <!-- ── Required fields (always visible) ── -->
   <div class="field">
     <label>Business Name *</label>
     <input type="text" id="biz-name" placeholder="e.g. King's Barbershop" autocapitalize="words" autocorrect="off">
@@ -136,107 +154,174 @@ select option{background:#111827;color:#e6ecf5}
     </select>
   </div>
 
+  <!-- Personality (visible in both modes) -->
   <div class="field">
-    <label>Business Website <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
-    <input type="url" id="biz-website" placeholder="https://their-website.com" autocapitalize="none" autocorrect="off" inputmode="url">
-    <div class="hint">Saved for your records. Auto-fill coming soon.</div>
-  </div>
-
-  <!-- Call Details -->
-  <div class="section">Call Details</div>
-
-  <div class="field">
-    <label>Most common thing customers call about</label>
-    <select id="call-reason">
-      <option value="">Not sure / General</option>
-      <option value="Booking an appointment">Booking an appointment</option>
-      <option value="Pricing">Pricing</option>
-      <option value="Hours">Hours</option>
-      <option value="Availability">Availability</option>
-      <option value="Reservations">Reservations</option>
-      <option value="Estimates">Estimates</option>
-      <option value="Services offered">Services offered</option>
-    </select>
-    <div class="hint">The AI will emphasize handling this in the demo call.</div>
-  </div>
-
-  <div class="field">
-    <label>Business Hours <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
-    <input type="text" id="biz-hours" placeholder="e.g. Mon–Sat 9am–6pm, closed Sunday" autocapitalize="words">
-    <div class="hint">Leave blank and the AI will handle it honestly.</div>
-  </div>
-
-  <!-- Services -->
-  <div class="section">Services <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional — 3 max)</span></div>
-
-  <div class="field">
-    <label>Service 1</label>
-    <div class="svc-row">
-      <input type="text" id="svc1" placeholder="e.g. Haircut" autocapitalize="words">
-      <input type="text" id="svc1-price" placeholder="$30" autocapitalize="none">
+    <label>Personality</label>
+    <div class="pill-row" id="personality-pills">
+      <button class="pill" data-val="professional" onclick="selectPersonality(this)">Professional</button>
+      <button class="pill active" data-val="friendly" onclick="selectPersonality(this)">Friendly</button>
+      <button class="pill" data-val="upscale" onclick="selectPersonality(this)">Upscale</button>
+      <button class="pill" data-val="casual" onclick="selectPersonality(this)">Casual</button>
+      <button class="pill" data-val="high_energy" onclick="selectPersonality(this)">High Energy</button>
     </div>
+    <input type="hidden" id="personality" value="friendly">
   </div>
-  <div class="field">
-    <label>Service 2</label>
-    <div class="svc-row">
-      <input type="text" id="svc2" placeholder="e.g. Beard Trim" autocapitalize="words">
-      <input type="text" id="svc2-price" placeholder="$15" autocapitalize="none">
+
+  <!-- ── Advanced-only fields ── -->
+  <div id="advanced-fields" style="display:none">
+
+    <div class="field">
+      <label>Business Website <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+      <input type="url" id="biz-website" placeholder="https://their-website.com" autocapitalize="none" autocorrect="off" inputmode="url">
+      <div class="hint">Saved for your records.</div>
     </div>
-  </div>
-  <div class="field">
-    <label>Service 3</label>
-    <div class="svc-row">
-      <input type="text" id="svc3" placeholder="e.g. Shape-Up" autocapitalize="words">
-      <input type="text" id="svc3-price" placeholder="$20" autocapitalize="none">
+
+    <div class="section">Call Details</div>
+
+    <div class="field">
+      <label>Most common thing customers call about</label>
+      <select id="call-reason">
+        <option value="">Not sure / General</option>
+        <option value="Booking an appointment">Booking an appointment</option>
+        <option value="Pricing">Pricing</option>
+        <option value="Hours">Hours</option>
+        <option value="Availability">Availability</option>
+        <option value="Reservations">Reservations</option>
+        <option value="Estimates">Estimates</option>
+        <option value="Services offered">Services offered</option>
+      </select>
+      <div class="hint">AI will emphasize handling this during the demo call.</div>
     </div>
-  </div>
 
-  <!-- Personalization -->
-  <div class="section">Personalization</div>
+    <div class="field">
+      <label>Business Hours <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+      <input type="text" id="biz-hours" placeholder="e.g. Mon–Sat 9am–6pm, closed Sunday" autocapitalize="words">
+      <div class="hint">Leave blank and the AI will handle it honestly.</div>
+    </div>
 
-  <div class="field">
-    <label>Owner / Manager First Name <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
-    <input type="text" id="owner-name" placeholder="e.g. Marcus" autocapitalize="words">
-    <div class="hint">AI will say "I'll make sure Marcus has this" instead of "the team."</div>
-  </div>
+    <div class="section">Services <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional — 3 max)</span></div>
 
-  <div class="field">
-    <label>Demo Agent Name</label>
-    <input type="text" id="agent-name" placeholder="Alex" autocapitalize="words" value="Alex">
-  </div>
+    <div class="field">
+      <label>Service 1</label>
+      <div class="svc-row">
+        <input type="text" id="svc1" placeholder="e.g. Haircut" autocapitalize="words">
+        <input type="text" id="svc1-price" placeholder="$30" autocapitalize="none">
+      </div>
+    </div>
+    <div class="field">
+      <label>Service 2</label>
+      <div class="svc-row">
+        <input type="text" id="svc2" placeholder="e.g. Beard Trim" autocapitalize="words">
+        <input type="text" id="svc2-price" placeholder="$15" autocapitalize="none">
+      </div>
+    </div>
+    <div class="field">
+      <label>Service 3</label>
+      <div class="svc-row">
+        <input type="text" id="svc3" placeholder="e.g. Shape-Up" autocapitalize="words">
+        <input type="text" id="svc3-price" placeholder="$20" autocapitalize="none">
+      </div>
+    </div>
+
+    <div class="section">Personalization</div>
+
+    <div class="field">
+      <label>Owner / Manager First Name <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+      <input type="text" id="owner-name" placeholder="e.g. Marcus" autocapitalize="words">
+      <div class="hint">AI will say "I'll make sure Marcus has this" instead of "the team."</div>
+    </div>
+
+    <div class="field">
+      <label>Demo Agent Name</label>
+      <input type="text" id="agent-name" placeholder="Alex" autocapitalize="words" value="Alex">
+    </div>
+
+  </div><!-- /advanced-fields -->
 
   <button class="btn btn-primary" id="preload-btn" onclick="preload()">Preload Demo</button>
+  <button class="btn btn-ghost" id="replay-btn" onclick="replayLast()">Replay Previous Demo</button>
   <div class="status-bar" id="status-bar"></div>
 </div>
 
-<!-- Result card (shown after successful preload) -->
+<!-- ── Result card ── -->
 <div class="result-card" id="result-card">
   <div class="result-label">Demo Ready</div>
   <div class="biz-name-display" id="result-biz-name"></div>
   <a class="phone-number" id="call-link" href="#">—</a>
   <div class="phone-hint">Hand them your phone and have them call this number</div>
 
+  <!-- Reveal copy -->
+  <div class="reveal-copy">
+    <div class="reveal-line">"Every missed call can become a conversation instead of voicemail."</div>
+    <div class="reveal-prompt">Ask them: How many calls do you think go to voicemail each week?</div>
+  </div>
+
   <div class="action-row">
     <button class="action-btn action-primary" onclick="copyPhone()">Copy Number</button>
-    <button class="action-btn action-green" onclick="convertToLead()">Convert to Lead</button>
+    <button class="action-btn action-green"   onclick="convertToLead()">Convert to Lead</button>
     <button class="action-btn action-outline" onclick="resetForm()">Reset</button>
+  </div>
+
+  <!-- Post-call summary -->
+  <div class="summary-card">
+    <div class="summary-hdr">
+      <span class="summary-title">Lead Captured</span>
+      <button class="summary-refresh" onclick="refreshSummary()">Refresh</button>
+    </div>
+    <div id="summary-body" class="summary-empty">No call captured yet. Complete a demo call, then tap Refresh.</div>
+  </div>
+</div>
+
+<!-- ── Stats section ── -->
+<div class="stats-section" id="stats-section">
+  <div class="stats-title">Your Demo Stats</div>
+  <div class="stats-row">
+    <div class="stat-item">
+      <div class="stat-num" id="stat-demos">—</div>
+      <div class="stat-lbl">Demos run</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="stat-calls">—</div>
+      <div class="stat-lbl">Calls received</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="stat-converted">—</div>
+      <div class="stat-lbl">Converted</div>
+    </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const API  = "https://dhriiwtpsaorqlxiuayu.supabase.co/functions/v1/create-demo-receptionist";
+const BASE = "https://dhriiwtpsaorqlxiuayu.supabase.co/functions/v1/create-demo-receptionist";
 const ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRocmlpd3Rwc2FvcnFseGl1YXl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc1MDQ3MDAsImV4cCI6MjA4MzA4MDcwMH0.l_-EJXZbxua0NZxaw8FnFM_S-JDCwagObFhXNQ4GKzM";
+const LS_KEY = "wtm_demo_last_payload";
 
-let loading = false;
+let loading     = false;
 let currentPhone = "";
 let currentBizName = "";
-let currentBizType = "";
-let currentMainCallReason = "";
+let currentSessionId = "";
+let demoMode    = "quick"; // "quick" | "advanced"
 
 function $(id){ return document.getElementById(id); }
 
+// ── Mode toggle ──────────────────────────────────────────────
+function setMode(mode){
+  demoMode = mode;
+  $("tab-quick").classList.toggle("active", mode === "quick");
+  $("tab-advanced").classList.toggle("active", mode === "advanced");
+  $("advanced-fields").style.display = mode === "advanced" ? "" : "none";
+}
+
+// ── Personality pills ────────────────────────────────────────
+function selectPersonality(el){
+  document.querySelectorAll("#personality-pills .pill").forEach(p => p.classList.remove("active"));
+  el.classList.add("active");
+  $("personality").value = el.dataset.val;
+}
+
+// ── Error / status ───────────────────────────────────────────
 function showErr(msg){
   const bar = $("err-bar");
   bar.textContent = msg;
@@ -244,32 +329,92 @@ function showErr(msg){
   bar.scrollIntoView({ behavior:"smooth", block:"nearest" });
 }
 function clearErr(){ $("err-bar").classList.remove("visible"); }
-
 function setStatus(msg, isErr){
   const bar = $("status-bar");
   bar.textContent = msg;
   bar.className = "status-bar" + (isErr ? " err" : "");
 }
 
+// ── Services ─────────────────────────────────────────────────
 function getServices(){
-  const services = [];
+  const svc = [];
   for(let i = 1; i <= 3; i++){
     const name  = $("svc" + i)?.value.trim();
     const price = $("svc" + i + "-price")?.value.trim();
-    if(name) services.push(price ? `${name} – ${price}` : name);
+    if(name) svc.push(price ? `${name} – ${price}` : name);
   }
-  return services;
+  return svc;
 }
 
+// ── Build payload ────────────────────────────────────────────
+function buildPayload(){
+  const isAdv = demoMode === "advanced";
+  return {
+    business_name:    $("biz-name").value.trim(),
+    business_type:    $("biz-type").value,
+    personality:      $("personality").value || "friendly",
+    main_call_reason: isAdv ? ($("call-reason")?.value || undefined) : undefined,
+    services:         isAdv ? (getServices().length ? getServices() : undefined) : undefined,
+    business_hours:   isAdv ? ($("biz-hours")?.value.trim() || undefined) : undefined,
+    owner_name:       isAdv ? ($("owner-name")?.value.trim() || undefined) : undefined,
+    agent_name:       isAdv ? ($("agent-name")?.value.trim() || "Alex") : "Alex",
+    business_website: isAdv ? ($("biz-website")?.value.trim() || undefined) : undefined,
+  };
+}
+
+// ── localStorage ─────────────────────────────────────────────
+function saveToStorage(payload){
+  try { localStorage.setItem(LS_KEY, JSON.stringify(payload)); } catch(_){}
+}
+
+function replayLast(){
+  let saved;
+  try { saved = JSON.parse(localStorage.getItem(LS_KEY) || "null"); } catch(_){}
+  if(!saved){ return showToast("No previous demo saved"); }
+
+  $("biz-name").value  = saved.business_name || "";
+  $("biz-type").value  = saved.business_type  || "";
+
+  // Personality
+  if(saved.personality){
+    $("personality").value = saved.personality;
+    document.querySelectorAll("#personality-pills .pill").forEach(p => {
+      p.classList.toggle("active", p.dataset.val === saved.personality);
+    });
+  }
+
+  // Switch to Advanced if any optional fields are populated
+  const hasAdv = saved.business_hours || saved.owner_name || saved.main_call_reason ||
+                 (Array.isArray(saved.services) && saved.services.length) || saved.business_website;
+  if(hasAdv){ setMode("advanced"); }
+
+  if($("biz-hours")) $("biz-hours").value = saved.business_hours || "";
+  if($("owner-name")) $("owner-name").value = saved.owner_name || "";
+  if($("agent-name")) $("agent-name").value = saved.agent_name || "Alex";
+  if($("call-reason")) $("call-reason").value = saved.main_call_reason || "";
+  if($("biz-website")) $("biz-website").value = saved.business_website || "";
+
+  const svcs = Array.isArray(saved.services) ? saved.services : [];
+  for(let i = 0; i < 3; i++){
+    const raw = svcs[i] || "";
+    const parts = raw.split(" – ");
+    if($("svc" + (i+1))) $("svc" + (i+1)).value = parts[0] || "";
+    if($("svc" + (i+1) + "-price")) $("svc" + (i+1) + "-price").value = parts[1] || "";
+  }
+
+  clearErr();
+  showToast("Previous demo loaded");
+  $("biz-name").focus();
+}
+
+// ── Preload ───────────────────────────────────────────────────
 async function preload(){
   if(loading) return;
 
-  const bizName = $("biz-name").value.trim();
-  const bizType = $("biz-type").value;
-
+  const payload = buildPayload();
   clearErr();
-  if(!bizName){ $("biz-name").focus(); return showErr("Business name is required."); }
-  if(!bizType){ $("biz-type").focus(); return showErr("Select a business type."); }
+  if(!payload.business_name){ $("biz-name").focus(); return showErr("Business name is required."); }
+  if(!payload.business_type){ $("biz-type").focus(); return showErr("Select a business type."); }
 
   loading = true;
   const btn = $("preload-btn");
@@ -277,24 +422,13 @@ async function preload(){
   btn.textContent = "Preloading...";
   setStatus("Configuring demo assistant...");
 
-  const payload = {
-    business_name:     bizName,
-    business_type:     bizType,
-    main_call_reason:  $("call-reason").value || undefined,
-    services:          getServices().length ? getServices() : undefined,
-    business_hours:    $("biz-hours").value.trim() || undefined,
-    owner_name:        $("owner-name").value.trim() || undefined,
-    agent_name:        $("agent-name").value.trim() || "Alex",
-    business_website:  $("biz-website").value.trim() || undefined,
-  };
-
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 20000);
 
-    const res = await fetch(API, {
+    const res = await fetch(BASE, {
       method:  "POST",
-      headers: { "Content-Type":"application/json", "apikey": ANON, "Authorization":"Bearer " + ANON },
+      headers: { "Content-Type":"application/json", "apikey":ANON, "Authorization":"Bearer "+ANON },
       body:    JSON.stringify(payload),
       signal:  controller.signal,
     });
@@ -311,53 +445,120 @@ async function preload(){
     }
 
     // Success
-    currentPhone = data.demo_phone_number || "";
-    currentBizName = bizName;
-    currentBizType = bizType;
-    currentMainCallReason = $("call-reason").value || "";
+    currentPhone      = data.demo_phone_number || "";
+    currentBizName    = payload.business_name;
+    currentSessionId  = data.session_id || "";
 
-    const agentName = $("agent-name").value.trim() || "Alex";
+    saveToStorage(payload);
+
+    $("result-biz-name").textContent = payload.business_name;
     const formatted = formatPhone(currentPhone);
-
-    $("result-biz-name").textContent = bizName;
     $("call-link").textContent = formatted || currentPhone;
     $("call-link").href = "tel:" + currentPhone.replace(/\D/g,"");
+
+    $("summary-body").className = "summary-empty";
+    $("summary-body").textContent = "No call captured yet. Complete a demo call, then tap Refresh.";
 
     $("form-view").style.display = "none";
     $("result-card").classList.add("show");
 
     if(navigator.vibrate) navigator.vibrate(50);
     setStatus("", false);
+    loadStats();
 
   } catch(err){
     loading = false;
     btn.disabled = false;
     btn.textContent = "Preload Demo";
-    const isTimeout = err.name === "AbortError";
     setStatus("", false);
+    const isTimeout = err.name === "AbortError";
     showErr(isTimeout ? "Request timed out. Check your connection and try again." : (err.message || "Connection error. Try again."));
   }
 }
 
+// ── Post-call summary ─────────────────────────────────────────
+async function refreshSummary(){
+  if(!currentSessionId){ return showToast("No active session"); }
+  const btn = document.querySelector(".summary-refresh");
+  if(btn){ btn.textContent = "Refreshing..."; btn.disabled = true; }
+
+  try {
+    const res = await fetch(`${BASE}?action=session&id=${currentSessionId}`, {
+      headers: { "apikey":ANON, "Authorization":"Bearer "+ANON }
+    });
+    const data = await res.json();
+
+    if(res.ok && data.success && data.session){
+      renderSummary(data.session);
+    } else {
+      $("summary-body").className = "summary-empty";
+      $("summary-body").textContent = "Could not fetch call data. Try again.";
+    }
+  } catch(_){
+    $("summary-body").className = "summary-empty";
+    $("summary-body").textContent = "Network error. Try again.";
+  } finally {
+    if(btn){ btn.textContent = "Refresh"; btn.disabled = false; }
+  }
+}
+
+function renderSummary(session){
+  const cs = session.last_call_summary;
+  const body = $("summary-body");
+
+  if(!cs || (!cs.summary && !cs.transcript_snippet)){
+    body.className = "summary-empty";
+    body.textContent = "No call captured yet. Complete a demo call, then tap Refresh.";
+    return;
+  }
+
+  body.className = "summary-body";
+  let html = "";
+
+  if(cs.duration_seconds){
+    const mins = Math.floor(cs.duration_seconds / 60);
+    const secs = cs.duration_seconds % 60;
+    const dur  = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+    html += `<div class="summary-field"><strong>Call Duration:</strong> ${dur}</div>`;
+  }
+  if(session.calls_received > 1){
+    html += `<div class="summary-field"><strong>Total Calls on This Demo:</strong> ${session.calls_received}</div>`;
+  }
+  if(cs.summary){
+    html += `<div class="summary-field" style="margin-top:8px"><strong>Summary:</strong><br>${escHtml(cs.summary)}</div>`;
+  }
+
+  body.innerHTML = html || '<span class="summary-empty">Call received but no summary available.</span>';
+}
+
+function escHtml(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+// ── Stats ─────────────────────────────────────────────────────
+async function loadStats(){
+  try {
+    const res  = await fetch(`${BASE}?action=stats`, { headers:{"apikey":ANON,"Authorization":"Bearer "+ANON} });
+    const data = await res.json();
+    if(data.success){
+      $("stat-demos").textContent     = data.total_demos     ?? "—";
+      $("stat-calls").textContent     = data.total_calls     ?? "—";
+      $("stat-converted").textContent = data.total_converted ?? "—";
+    }
+  } catch(_){}
+}
+
+// ── Utilities ─────────────────────────────────────────────────
 function formatPhone(raw){
-  const digits = (raw || "").replace(/\D/g,"");
-  if(digits.length === 11 && digits[0] === "1"){
-    return `(${digits.slice(1,4)}) ${digits.slice(4,7)}-${digits.slice(7)}`;
-  }
-  if(digits.length === 10){
-    return `(${digits.slice(0,3)}) ${digits.slice(3,6)}-${digits.slice(6)}`;
-  }
+  const d = (raw||"").replace(/\D/g,"");
+  if(d.length===11 && d[0]==="1") return `(${d.slice(1,4)}) ${d.slice(4,7)}-${d.slice(7)}`;
+  if(d.length===10) return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;
   return raw;
 }
 
 function copyPhone(){
   if(!currentPhone) return;
-  const text = (currentPhone).replace(/\D/g,"");
-  navigator.clipboard?.writeText(text).then(() => {
+  navigator.clipboard?.writeText(currentPhone.replace(/\D/g,"")).then(() => {
     showToast("Number copied");
-  }).catch(() => {
-    showToast("Tap the number to call");
-  });
+  }).catch(() => showToast("Tap the number to call"));
 }
 
 function showToast(msg){
@@ -368,7 +569,6 @@ function showToast(msg){
 }
 
 function convertToLead(){
-  // Open close.html with biz name pre-filled via URL param
   const params = new URLSearchParams({ biz: currentBizName });
   window.location.href = "close.html?" + params.toString();
 }
@@ -377,17 +577,20 @@ function resetForm(){
   loading = false;
   currentPhone = "";
   currentBizName = "";
+  currentSessionId = "";
   $("result-card").classList.remove("show");
   $("form-view").style.display = "";
   $("preload-btn").disabled = false;
   $("preload-btn").textContent = "Preload Demo";
   setStatus("", false);
   clearErr();
-  // Restore focus to business name
   setTimeout(() => $("biz-name")?.focus(), 100);
 }
 
-// Enter key on any input triggers preload
+// ── Init ──────────────────────────────────────────────────────
+loadStats();
+
+// Enter triggers preload
 document.addEventListener("keydown", function(e){
   if(e.key === "Enter" && !loading) preload();
 });
