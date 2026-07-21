@@ -455,8 +455,10 @@ async function submitReceptionist({ fname, biz, phone, email, sdrId, token }) {
   const res  = await fetch(API_CLOSE, {
     method:  "POST",
     headers: {
-      "Content-Type":  "application/json",
-      "Authorization": "Bearer " + token,
+      "Content-Type":   "application/json",
+      "apikey":         ANON_KEY,
+      "Authorization":  "Bearer " + ANON_KEY,
+      "X-Console-Token": token,
     },
     body: JSON.stringify(body),
   });
