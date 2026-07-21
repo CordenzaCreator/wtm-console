@@ -3,22 +3,47 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>WTM — Close</title>
+<title>WTM — Close Console</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:-apple-system,system-ui,sans-serif;background:#0a0e1a;color:#e6ecf5;padding:20px 16px 40px;max-width:480px;margin:0 auto;min-height:100vh}
+
+/* Token gate */
+#token-gate{position:fixed;inset:0;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;z-index:999;padding:20px}
+.gate-box{background:#111827;border:1px solid #1f2a44;border-radius:14px;padding:28px 24px;width:100%;max-width:380px}
+.gate-box h2{color:#e6ecf5;font-size:18px;margin-bottom:6px}
+.gate-box p{color:#6b7a90;font-size:13px;margin-bottom:20px;line-height:1.5}
+.gate-input{width:100%;background:#0a0e1a;border:1px solid #1f2a44;border-radius:8px;padding:13px;color:#e6ecf5;font-size:15px;outline:none;margin-bottom:12px}
+.gate-input:focus{border-color:#2563EB}
+.gate-btn{width:100%;padding:13px;background:#2563EB;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer}
+.gate-err{color:#fca5a5;font-size:12px;margin-top:8px;display:none}
+
 h1{color:#2563EB;font-size:20px;font-weight:700;margin-bottom:2px}
 .sub{color:#6b7a90;font-size:13px;margin-bottom:24px}
 label{display:block;color:#6b7a90;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-input{width:100%;background:#111827;border:1px solid #1f2a44;border-radius:8px;padding:14px;color:#e6ecf5;font-size:16px;outline:none;transition:border-color .15s}
-input:focus{border-color:#2563EB}
+input,select{width:100%;background:#111827;border:1px solid #1f2a44;border-radius:8px;padding:14px;color:#e6ecf5;font-size:16px;outline:none;transition:border-color .15s;appearance:none;-webkit-appearance:none}
+input:focus,select:focus{border-color:#2563EB}
 input::placeholder{color:#374151}
+select option{background:#111827}
+
 .field{margin-bottom:16px}
 .hint{color:#4a5568;font-size:12px;margin-top:5px}
+
 /* Product type tabs */
-.type-tabs{display:flex;gap:0;margin-bottom:24px;border:2px solid #1f2a44;border-radius:10px;overflow:hidden}
+.type-tabs{display:flex;gap:0;border:2px solid #1f2a44;border-radius:10px;overflow:hidden}
 .type-tab{flex:1;padding:12px;background:#111827;color:#6b7a90;font-size:14px;font-weight:700;cursor:pointer;text-align:center;transition:all .15s;border:none}
 .type-tab.active{background:#0d1933;color:#e6ecf5;border-bottom:2px solid #2563EB}
+
+/* Workflow tabs (inside Receptionist) */
+.wf-tabs{display:flex;gap:8px;margin-bottom:20px}
+.wf-tab{flex:1;padding:11px 8px;border:2px solid #1f2a44;border-radius:8px;background:#111827;color:#6b7a90;font-size:13px;font-weight:700;cursor:pointer;text-align:center;transition:all .15s}
+.wf-tab.active{border-color:#2563EB;color:#e6ecf5;background:#0d1933}
+
+/* Delivery method (SMS / Email) */
+.dm-row{display:flex;gap:8px;margin-bottom:16px}
+.dm-btn{flex:1;padding:12px 8px;border:2px solid #1f2a44;border-radius:8px;background:#111827;color:#6b7a90;font-size:14px;font-weight:600;cursor:pointer;text-align:center;transition:all .15s}
+.dm-btn.active{border-color:#2563EB;color:#e6ecf5;background:#0d1933}
+
 /* Package selector */
 .pkg-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
 .pkg-card{background:#111827;border:2px solid #1f2a44;border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;user-select:none}
@@ -26,19 +51,22 @@ input::placeholder{color:#374151}
 .pkg-name{font-size:13px;font-weight:700;color:#e6ecf5;margin-bottom:4px}
 .pkg-price{font-size:12px;color:#2563EB;font-weight:600}
 .pkg-dep{font-size:11px;color:#6b7a90;margin-top:2px}
+
 /* Receptionist card */
-.rec-card{background:#111827;border:2px solid #1f2a44;border-radius:10px;padding:16px;margin-bottom:8px;cursor:pointer;transition:border-color .15s,background .15s;user-select:none}
-.rec-card.active{border-color:#2563EB;background:#0d1933}
+.rec-card{background:#111827;border:2px solid #1f2a44;border-radius:10px;padding:16px;margin-bottom:20px}
 .rec-top{display:flex;justify-content:space-between;align-items:flex-start}
 .rec-name{font-size:15px;font-weight:700;color:#e6ecf5;margin-bottom:4px}
 .rec-tagline{font-size:12px;color:#6b7a90;line-height:1.5}
-.rec-price-block{text-align:right;white-space:nowrap}
+.rec-price-block{text-align:right;white-space:nowrap;margin-left:12px}
 .rec-price{font-size:17px;color:#2563EB;font-weight:700}
 .rec-cycle{font-size:11px;color:#6b7a90}
+.rec-meta{font-size:11px;color:#4a5568;margin-top:8px;padding-top:8px;border-top:1px solid #1f2a44}
+
 /* Platform toggle */
-.toggle-row{display:flex;gap:8px;margin-bottom:24px}
+.toggle-row{display:flex;gap:8px;margin-bottom:20px}
 .toggle-btn{flex:1;padding:10px;border:2px solid #1f2a44;border-radius:8px;background:#111827;color:#6b7a90;font-size:13px;font-weight:600;cursor:pointer;text-align:center;transition:all .15s}
 .toggle-btn.active{border-color:#2563EB;color:#e6ecf5;background:#0d1933}
+
 /* Summary bar */
 .summary{background:#111827;border:1px solid #1f2a44;border-radius:8px;padding:14px;margin-bottom:20px;display:none}
 .summary.visible{display:block}
@@ -46,28 +74,49 @@ input::placeholder{color:#374151}
 .sum-label{color:#6b7a90;font-size:13px}
 .sum-val{color:#e6ecf5;font-size:14px;font-weight:700}
 .sum-sub{color:#2563EB;font-size:13px;font-weight:600;margin-top:4px;text-align:right}
+
+/* Section divider */
+.section-label{color:#c8d3e2;font-size:14px;font-weight:600;margin-bottom:12px;padding-top:4px}
+
 /* Submit */
-.btn-submit{width:100%;padding:16px;background:linear-gradient(135deg,#1E40AF,#2563EB);color:#fff;border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:opacity .15s}
+.btn-submit{width:100%;padding:16px;background:linear-gradient(135deg,#1E40AF,#2563EB);color:#fff;border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:opacity .15s;margin-top:4px}
 .btn-submit:disabled{opacity:.4;cursor:default}
+
 /* Success */
 #success{display:none;text-align:center;padding:40px 0}
 .check-icon{width:60px;height:60px;background:#164e1a;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px}
-#success h2{color:#22c55e;font-size:22px;margin-bottom:8px}
+.zoom-icon{width:60px;height:60px;background:#0d1933;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px}
+#success h2{font-size:22px;margin-bottom:8px}
 #success p{color:#6b7a90;font-size:14px;line-height:1.6;margin-bottom:8px}
 .new-btn{margin-top:24px;width:100%;padding:14px;background:#1f2a44;color:#2563EB;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer}
+
 /* Error */
 .err-bar{background:#2d0a0a;border:1px solid #7f1d1d;color:#fca5a5;padding:12px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none}
 .err-bar.visible{display:block}
-.section-label{color:#c8d3e2;font-size:14px;font-weight:600;margin-bottom:10px}
-.hidden{display:none}
+
+.hidden{display:none!important}
 </style>
 </head>
 <body>
 
+<!-- TOKEN GATE -->
+<div id="token-gate">
+  <div class="gate-box">
+    <h2>Access Required</h2>
+    <p>Enter your Close Console access token to continue. Contact Jaleel if you need access.</p>
+    <input class="gate-input" id="gate-input" type="password" placeholder="Paste your access token" autocomplete="off">
+    <button class="gate-btn" onclick="submitToken()">Unlock Console</button>
+    <div class="gate-err" id="gate-err">Invalid token. Try again or contact Jaleel.</div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app-view" style="display:none">
+
 <div style="text-align:center;margin-bottom:20px">
   <img src="logo.png" alt="WebToMobile Pro" style="height:52px;width:auto;display:block;margin:0 auto 6px">
-  <h1 style="font-size:18px;margin:0 0 2px">In-Person Close</h1>
-  <div class="sub" style="margin-bottom:0">Send a payment link on the spot</div>
+  <h1 style="font-size:18px;margin:0 0 2px">Close Console</h1>
+  <div class="sub" style="margin-bottom:0">Send a payment link or book a call on the spot</div>
 </div>
 
 <div id="form-view">
@@ -82,7 +131,7 @@ input::placeholder{color:#374151}
     </div>
   </div>
 
-  <!-- APP: package grid -->
+  <!-- ── APP SECTION ── -->
   <div id="app-section">
     <div class="field">
       <label>Package</label>
@@ -113,27 +162,71 @@ input::placeholder{color:#374151}
     </div>
   </div>
 
-  <!-- RECEPTIONIST: single card -->
+  <!-- ── RECEPTIONIST SECTION ── -->
   <div id="rec-section" class="hidden">
-    <div class="field">
-      <label>Plan</label>
-      <div class="rec-card active" id="rec-card">
-        <div class="rec-top">
-          <div>
-            <div class="rec-name">AI Receptionist</div>
-            <div class="rec-tagline">Answers calls 24/7. Books appointments.<br>Handles FAQs. No staff needed.</div>
-          </div>
-          <div class="rec-price-block">
-            <div class="rec-price">$297</div>
-            <div class="rec-cycle">/month</div>
-          </div>
+
+    <div class="rec-card">
+      <div class="rec-top">
+        <div>
+          <div class="rec-name">AI Receptionist</div>
+          <div class="rec-tagline">Answers calls 24/7. Books appointments.<br>Handles FAQs. No staff needed.</div>
         </div>
-        <div style="margin-top:10px;font-size:11px;color:#6b7a90;border-top:1px solid #1f2a44;padding-top:8px">Rate locked for life &middot; Standard rate $497/mo</div>
+        <div class="rec-price-block">
+          <div class="rec-price">$297</div>
+          <div class="rec-cycle">/month</div>
+        </div>
+      </div>
+      <div class="rec-meta">No long-term contract &middot; Cancel anytime &middot; No setup fee</div>
+    </div>
+
+    <label style="margin-bottom:8px">Action</label>
+    <div class="wf-tabs" style="margin-bottom:20px">
+      <div class="wf-tab active" id="wf-checkout" onclick="setWorkflow('checkout')">Send Checkout Link</div>
+      <div class="wf-tab" id="wf-zoom" onclick="setWorkflow('zoom')">Book Zoom Call</div>
+    </div>
+
+    <!-- Checkout sub-section -->
+    <div id="checkout-section">
+      <label style="margin-bottom:8px">Delivery Method</label>
+      <div class="dm-row">
+        <div class="dm-btn active" id="dm-sms" onclick="setDelivery('sms')">📱 Text Message</div>
+        <div class="dm-btn" id="dm-email" onclick="setDelivery('email')">📧 Email</div>
       </div>
     </div>
-  </div>
 
-  <!-- Summary -->
+    <!-- Zoom sub-section -->
+    <div id="zoom-section" class="hidden">
+      <div class="field">
+        <label>Date (Central Time)</label>
+        <input type="date" id="z-date">
+      </div>
+      <div class="field">
+        <label>Time (Central Time)</label>
+        <select id="z-time">
+          <option value="">Select a time...</option>
+          <option value="09:00">9:00 AM CT</option>
+          <option value="09:30">9:30 AM CT</option>
+          <option value="10:00">10:00 AM CT</option>
+          <option value="10:30">10:30 AM CT</option>
+          <option value="11:00">11:00 AM CT</option>
+          <option value="11:30">11:30 AM CT</option>
+          <option value="12:00">12:00 PM CT</option>
+          <option value="12:30">12:30 PM CT</option>
+          <option value="13:00">1:00 PM CT</option>
+          <option value="13:30">1:30 PM CT</option>
+          <option value="14:00">2:00 PM CT</option>
+          <option value="14:30">2:30 PM CT</option>
+          <option value="15:00">3:00 PM CT</option>
+          <option value="15:30">3:30 PM CT</option>
+          <option value="16:00">4:00 PM CT</option>
+          <option value="16:30">4:30 PM CT</option>
+        </select>
+      </div>
+    </div>
+
+  </div><!-- /rec-section -->
+
+  <!-- Summary (app only) -->
   <div class="summary" id="summary">
     <div class="sum-line">
       <span class="sum-label" id="sum-label">Package</span>
@@ -142,41 +235,63 @@ input::placeholder{color:#374151}
     <div class="sum-sub" id="sum-sub"></div>
   </div>
 
-  <!-- Contact info -->
+  <!-- Prospect Info -->
   <div class="section-label">Prospect Info</div>
 
   <div class="field">
     <label>First Name</label>
     <input type="text" id="fname" placeholder="Marcus" autocomplete="given-name">
   </div>
+  <div class="field" id="lname-field" style="display:none">
+    <label>Last Name <span style="color:#4a5568;font-weight:400">(optional)</span></label>
+    <input type="text" id="lname" placeholder="Johnson" autocomplete="family-name">
+  </div>
   <div class="field">
     <label>Business Name</label>
-    <input type="text" id="biz" placeholder="Cut & Style Barbershop" autocomplete="organization">
+    <input type="text" id="biz" placeholder="Cut &amp; Style Barbershop" autocomplete="organization">
   </div>
-  <div class="field">
-    <label>Email</label>
+
+  <div class="field" id="email-field">
+    <label id="email-label">Email</label>
     <input type="email" id="email" placeholder="owner@business.com" inputmode="email" autocomplete="email">
+    <div class="hint" id="email-hint"></div>
   </div>
-  <div class="field">
-    <label>Phone <span style="color:#4a5568;font-weight:400">(optional)</span></label>
+
+  <div class="field" id="phone-field">
+    <label id="phone-label">Phone</label>
     <input type="tel" id="phone" placeholder="(555) 000-0000" inputmode="tel" autocomplete="tel">
-    <div class="hint">Used for follow-up only. Payment link goes to email.</div>
+    <div class="hint" id="phone-hint"></div>
   </div>
 
-  <button class="btn-submit" id="submit-btn" onclick="submitClose()">Send Payment Link</button>
-</div>
+  <div class="field" id="sdr-field" style="display:none">
+    <label>Your Name (SDR)</label>
+    <input type="text" id="sdr" placeholder="Karen-Ann" autocomplete="name">
+  </div>
 
+  <button class="btn-submit" id="submit-btn" onclick="submitForm()">Send Payment Link</button>
+</div><!-- /form-view -->
+
+<!-- SUCCESS STATE -->
 <div id="success">
-  <div class="check-icon">&#10003;</div>
-  <h2>Payment Link Sent</h2>
-  <p id="success-msg"></p>
-  <p id="success-amount" style="color:#2563EB;font-size:18px;font-weight:700;margin-top:8px"></p>
+  <div id="success-icon-checkout" class="check-icon" style="display:none">&#10003;</div>
+  <div id="success-icon-zoom" class="zoom-icon" style="display:none">📅</div>
+  <h2 id="success-title" style="color:#22c55e"></h2>
+  <p id="success-line1"></p>
+  <p id="success-line2" style="color:#2563EB;font-size:16px;font-weight:600;margin-top:6px"></p>
+  <p id="success-line3" style="margin-top:8px"></p>
   <button class="new-btn" onclick="resetForm()">Close Another</button>
 </div>
 
+</div><!-- /app-view -->
+
 <script>
-const API  = "https://dhriiwtpsaorqlxiuayu.supabase.co/functions/v1/capture-inperson-lead";
+// ── Config ────────────────────────────────────────────────────────
 const ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRocmlpd3Rwc2FvcnFseGl1YXl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc1MDQ3MDAsImV4cCI6MjA4MzA4MDcwMH0.l_-EJXZbxua0NZxaw8FnFM_S-JDCwagObFhXNQ4GKzM";
+const BASE = "https://dhriiwtpsaorqlxiuayu.supabase.co/functions/v1";
+
+const API_APP      = BASE + "/capture-inperson-lead";
+const API_CHECKOUT = BASE + "/send-close-checkout";
+const API_ZOOM     = BASE + "/book-close-zoom";
 
 const APP_PRICES = {
   launch:     { ios: 300000,  dual: 600000  },
@@ -184,25 +299,63 @@ const APP_PRICES = {
   enterprise: { ios: 950000,  dual: 1900000 },
 };
 
-let productType = "app";   // "app" | "receptionist"
-let selectedPkg = null;    // "launch" | "growth" | "enterprise"
-let platform    = "ios";   // "ios" | "dual"
+// ── State ─────────────────────────────────────────────────────────
+let productType    = "app";        // "app" | "receptionist"
+let recWorkflow    = "checkout";   // "checkout" | "zoom"
+let deliveryMethod = "sms";        // "sms" | "email"
+let selectedPkg    = null;
+let platform       = "ios";
+let requestId      = crypto.randomUUID();
 
-function fmt(cents) {
-  return "$" + (cents / 100).toLocaleString("en-US");
+// ── Token Gate ────────────────────────────────────────────────────
+function initAuth() {
+  const stored = localStorage.getItem("wtm_cc_token");
+  if (stored) {
+    showApp();
+  } else {
+    document.getElementById("token-gate").style.display = "flex";
+    document.getElementById("app-view").style.display   = "none";
+  }
 }
 
+function showApp() {
+  document.getElementById("token-gate").style.display = "none";
+  document.getElementById("app-view").style.display   = "block";
+  // Set date min to tomorrow
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  document.getElementById("z-date").min = tomorrow.toISOString().split("T")[0];
+  updateFieldVisibility();
+}
+
+function submitToken() {
+  const token = document.getElementById("gate-input").value.trim();
+  if (!token) return;
+  localStorage.setItem("wtm_cc_token", token);
+  showApp();
+}
+
+document.getElementById("gate-input").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") submitToken();
+});
+
+// ── Product Type ──────────────────────────────────────────────────
 function setProductType(t) {
   productType = t;
   document.getElementById("tab-app").classList.toggle("active", t === "app");
   document.getElementById("tab-rec").classList.toggle("active", t === "receptionist");
   document.getElementById("app-section").classList.toggle("hidden", t !== "app");
   document.getElementById("rec-section").classList.toggle("hidden", t !== "receptionist");
-  selectedPkg = (t === "receptionist") ? "receptionist" : null;
-  document.querySelectorAll(".pkg-card").forEach(c => c.classList.remove("active"));
-  updateSummary();
+  if (t === "app") {
+    selectedPkg = null;
+    document.querySelectorAll(".pkg-card").forEach(c => c.classList.remove("active"));
+    document.getElementById("summary").classList.remove("visible");
+  }
+  updateFieldVisibility();
+  clearErr();
 }
 
+// ── Platform ──────────────────────────────────────────────────────
 function setPlatform(p) {
   platform = p;
   document.getElementById("btn-ios").classList.toggle("active", p === "ios");
@@ -218,17 +371,22 @@ function updatePrices() {
   updateSummary();
 }
 
+function fmt(cents) {
+  return "$" + (cents / 100).toLocaleString("en-US");
+}
+
+// ── Package grid ──────────────────────────────────────────────────
+document.getElementById("pkg-grid").addEventListener("click", function(e) {
+  const card = e.target.closest(".pkg-card");
+  if (!card) return;
+  selectedPkg = card.dataset.pkg;
+  document.querySelectorAll(".pkg-card").forEach(c => c.classList.remove("active"));
+  card.classList.add("active");
+  updateSummary();
+});
+
 function updateSummary() {
   const sum = document.getElementById("summary");
-
-  if (productType === "receptionist") {
-    sum.classList.add("visible");
-    document.getElementById("sum-label").textContent = "Plan";
-    document.getElementById("sum-pkg").textContent = "AI Receptionist";
-    document.getElementById("sum-sub").textContent = "$297/mo locked for life (standard $497)";
-    return;
-  }
-
   if (!selectedPkg) { sum.classList.remove("visible"); return; }
   sum.classList.add("visible");
   const total = APP_PRICES[selectedPkg][platform];
@@ -239,21 +397,89 @@ function updateSummary() {
   document.getElementById("sum-sub").textContent = "Full payment: " + fmt(total);
 }
 
-document.getElementById("pkg-grid").addEventListener("click", function(e) {
-  const card = e.target.closest(".pkg-card");
-  if (!card) return;
-  selectedPkg = card.dataset.pkg;
-  document.querySelectorAll(".pkg-card").forEach(c => c.classList.remove("active"));
-  card.classList.add("active");
-  updateSummary();
-});
-
-function getPackageKey() {
-  if (productType === "receptionist") return "receptionist";
-  if (!selectedPkg) return null;
-  return platform === "dual" ? selectedPkg + "_dual" : selectedPkg;
+// ── Receptionist Workflow ─────────────────────────────────────────
+function setWorkflow(w) {
+  recWorkflow = w;
+  document.getElementById("wf-checkout").classList.toggle("active", w === "checkout");
+  document.getElementById("wf-zoom").classList.toggle("active", w === "zoom");
+  document.getElementById("checkout-section").classList.toggle("hidden", w !== "checkout");
+  document.getElementById("zoom-section").classList.toggle("hidden", w !== "zoom");
+  updateFieldVisibility();
+  clearErr();
 }
 
+// ── Delivery Method ───────────────────────────────────────────────
+function setDelivery(d) {
+  deliveryMethod = d;
+  document.getElementById("dm-sms").classList.toggle("active", d === "sms");
+  document.getElementById("dm-email").classList.toggle("active", d === "email");
+  updateFieldVisibility();
+  clearErr();
+}
+
+// ── Field Visibility ──────────────────────────────────────────────
+function updateFieldVisibility() {
+  const isApp      = productType === "app";
+  const isRec      = productType === "receptionist";
+  const isCheckout = isRec && recWorkflow === "checkout";
+  const isZoom     = isRec && recWorkflow === "zoom";
+  const isSms      = isCheckout && deliveryMethod === "sms";
+  const isEmail    = isCheckout && deliveryMethod === "email";
+
+  // Last name: show for Zoom
+  document.getElementById("lname-field").style.display = isZoom ? "block" : "none";
+
+  // Email field
+  const ef = document.getElementById("email-field");
+  const el = document.getElementById("email-label");
+  const eh = document.getElementById("email-hint");
+  if (isApp || isEmail) {
+    ef.classList.remove("hidden");
+    el.textContent = "Email";
+    eh.textContent = isApp ? "" : "Checkout link and confirmation will go here.";
+  } else if (isZoom) {
+    ef.classList.remove("hidden");
+    el.textContent = "Email (recommended)";
+    eh.textContent = "Calendar invite and Zoom link will be sent here.";
+  } else if (isSms) {
+    ef.classList.add("hidden");
+  } else {
+    ef.classList.remove("hidden");
+  }
+
+  // Phone field
+  const pf = document.getElementById("phone-field");
+  const pl = document.getElementById("phone-label");
+  const ph = document.getElementById("phone-hint");
+  if (isSms) {
+    pf.classList.remove("hidden");
+    pl.textContent = "Phone";
+    ph.textContent = "Checkout link will be sent here via text.";
+  } else if (isApp) {
+    pf.classList.remove("hidden");
+    pl.textContent = "Phone (optional)";
+    ph.textContent = "Used for follow-up only.";
+  } else if (isZoom) {
+    pf.classList.remove("hidden");
+    pl.textContent = "Phone (optional)";
+    ph.textContent = "SMS confirmation of Zoom time.";
+  } else if (isEmail) {
+    pf.classList.add("hidden");
+  } else {
+    pf.classList.remove("hidden");
+  }
+
+  // SDR field: show for receptionist
+  document.getElementById("sdr-field").style.display = isRec ? "block" : "none";
+
+  // Submit button label
+  const btn = document.getElementById("submit-btn");
+  if (isApp)           btn.textContent = "Send Payment Link";
+  else if (isCheckout) btn.textContent = "Send Checkout Link";
+  else if (isZoom)     btn.textContent = "Book Zoom Call";
+}
+
+// ── Errors ────────────────────────────────────────────────────────
 function showErr(msg) {
   const bar = document.getElementById("err-bar");
   bar.textContent = msg;
@@ -264,76 +490,211 @@ function clearErr() {
   document.getElementById("err-bar").classList.remove("visible");
 }
 
-async function submitClose() {
+// ── Submit ────────────────────────────────────────────────────────
+async function submitForm() {
   clearErr();
-  const fname = document.getElementById("fname").value.trim();
-  const biz   = document.getElementById("biz").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const phone = document.getElementById("phone").value.trim();
-  const pkg   = getPackageKey();
 
-  if (!pkg)   return showErr("Select a package.");
+  const fname = document.getElementById("fname").value.trim();
+  const lname = document.getElementById("lname").value.trim();
+  const biz   = document.getElementById("biz").value.trim();
+  const email = document.getElementById("email").value.trim().toLowerCase();
+  const phone = document.getElementById("phone").value.trim();
+  const sdr   = document.getElementById("sdr").value.trim();
+
   if (!fname) return showErr("Enter the prospect's first name.");
   if (!biz)   return showErr("Enter the business name.");
-  if (!email) return showErr("Enter the prospect's email.");
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showErr("Enter a valid email address.");
+
+  const token = localStorage.getItem("wtm_cc_token") || "";
+  const headers = {
+    "Content-Type":     "application/json",
+    "apikey":           ANON,
+    "Authorization":    "Bearer " + ANON,
+    "X-Console-Token":  token,
+  };
 
   const btn = document.getElementById("submit-btn");
+  const originalLabel = btn.textContent;
   btn.disabled = true;
   btn.textContent = "Sending...";
 
   try {
-    const res = await fetch(API, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "apikey": ANON, "Authorization": "Bearer " + ANON },
-      body: JSON.stringify({
-        business_name:      biz,
-        contact_first_name: fname,
-        email,
-        phone:              phone || undefined,
-        package_type:       pkg,
-      }),
-    });
-
-    const data = await res.json();
-    if (!res.ok || !data.success) {
-      showErr(data.error || data.reason || "Something went wrong. Try again.");
-      btn.disabled = false;
-      btn.textContent = "Send Payment Link";
-      return;
+    if (productType === "app") {
+      await submitApp(fname, biz, email, phone, headers, btn, originalLabel);
+    } else if (recWorkflow === "checkout") {
+      await submitCheckout(fname, biz, email, phone, sdr, headers, btn, originalLabel);
+    } else {
+      await submitZoom(fname, lname, biz, email, phone, sdr, headers, btn, originalLabel);
     }
-
-    document.getElementById("success-msg").textContent = "Link sent to " + email;
-    document.getElementById("success-amount").textContent = data.amount_display;
-    document.getElementById("form-view").style.display = "none";
-    document.getElementById("success").style.display = "block";
-    window.scrollTo(0, 0);
-
-  } catch (e) {
-    showErr("Network error. Check connection and try again.");
+  } catch(e) {
+    showErr("Network error. Check your connection and try again.");
     btn.disabled = false;
-    btn.textContent = "Send Payment Link";
+    btn.textContent = originalLabel;
   }
 }
 
-// Pre-fill business name when navigating from demo.html (?biz=)
-(function(){
-  const bizParam = new URLSearchParams(window.location.search).get("biz");
-  if(bizParam){
-    const el = document.getElementById("biz");
-    if(el) el.value = decodeURIComponent(bizParam);
-    const tab = document.getElementById("tab-rec");
-    if(tab) { tab.click(); }
-  }
-})();
+// ── App path ──────────────────────────────────────────────────────
+async function submitApp(fname, biz, email, phone, headers, btn, originalLabel) {
+  if (!selectedPkg) { btn.disabled = false; btn.textContent = originalLabel; return showErr("Select a package."); }
+  if (!email)        { btn.disabled = false; btn.textContent = originalLabel; return showErr("Enter the prospect's email."); }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { btn.disabled = false; btn.textContent = originalLabel; return showErr("Enter a valid email address."); }
 
+  const pkg = platform === "dual" ? selectedPkg + "_dual" : selectedPkg;
+  const res  = await fetch(API_APP, {
+    method:  "POST",
+    headers: { "Content-Type": "application/json", "apikey": ANON, "Authorization": "Bearer " + ANON },
+    body: JSON.stringify({ business_name: biz, contact_first_name: fname, email, phone: phone || undefined, package_type: pkg }),
+  });
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    showErr(data.error || data.reason || "Something went wrong. Try again.");
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+    return;
+  }
+  showSuccess({
+    isCheckout: true,
+    title: "Payment Link Sent",
+    line1: "Link sent to " + email,
+    line2: data.amount_display || "",
+    line3: "Awaiting payment.",
+  });
+}
+
+// ── Checkout path ─────────────────────────────────────────────────
+async function submitCheckout(fname, biz, email, phone, sdr, headers, btn, originalLabel) {
+  const isSms = deliveryMethod === "sms";
+
+  if (isSms) {
+    if (!phone) { btn.disabled = false; btn.textContent = originalLabel; return showErr("Enter the prospect's phone number for SMS delivery."); }
+  } else {
+    if (!email) { btn.disabled = false; btn.textContent = originalLabel; return showErr("Enter the prospect's email address."); }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { btn.disabled = false; btn.textContent = originalLabel; return showErr("Enter a valid email address."); }
+  }
+
+  const res  = await fetch(API_CHECKOUT, {
+    method:  "POST",
+    headers,
+    body: JSON.stringify({
+      request_id:      requestId,
+      first_name:      fname,
+      business_name:   biz,
+      delivery_method: deliveryMethod,
+      phone:           phone || undefined,
+      email:           email || undefined,
+      sdr_id:          sdr || undefined,
+    }),
+  });
+
+  if (res.status === 401) {
+    // Token rejected — re-prompt gate without losing form data
+    localStorage.removeItem("wtm_cc_token");
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+    document.getElementById("token-gate").style.display = "flex";
+    document.getElementById("app-view").style.display   = "none";
+    document.getElementById("gate-err").style.display   = "block";
+    return;
+  }
+
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    showErr(data.error || "Could not send checkout link. Try again.");
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+    return;
+  }
+
+  const dest = data.masked_destination || (isSms ? "their phone" : email);
+  showSuccess({
+    isCheckout: true,
+    title: "Checkout Link Sent",
+    line1: isSms ? ("Link texted to " + dest) : ("Link emailed to " + dest),
+    line2: "$297/month",
+    line3: "Awaiting payment. Stripe will notify when they complete checkout.",
+  });
+}
+
+// ── Zoom path ─────────────────────────────────────────────────────
+async function submitZoom(fname, lname, biz, email, phone, sdr, headers, btn, originalLabel) {
+  const date = document.getElementById("z-date").value;
+  const time = document.getElementById("z-time").value;
+
+  if (!date) { btn.disabled = false; btn.textContent = originalLabel; return showErr("Select a date for the Zoom call."); }
+  if (!time) { btn.disabled = false; btn.textContent = originalLabel; return showErr("Select a time for the Zoom call."); }
+  if (!email && !phone) { btn.disabled = false; btn.textContent = originalLabel; return showErr("Enter at least an email or phone number to send confirmation."); }
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { btn.disabled = false; btn.textContent = originalLabel; return showErr("Enter a valid email address."); }
+
+  const res  = await fetch(API_ZOOM, {
+    method:  "POST",
+    headers,
+    body: JSON.stringify({
+      request_id:    requestId,
+      first_name:    fname,
+      last_name:     lname || undefined,
+      business_name: biz,
+      date,
+      time,
+      email:         email || undefined,
+      phone:         phone || undefined,
+      sdr_id:        sdr  || undefined,
+      timezone:      "America/Chicago",
+    }),
+  });
+
+  if (res.status === 401) {
+    localStorage.removeItem("wtm_cc_token");
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+    document.getElementById("token-gate").style.display = "flex";
+    document.getElementById("app-view").style.display   = "none";
+    document.getElementById("gate-err").style.display   = "block";
+    return;
+  }
+
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    showErr(data.error || "Could not book Zoom call. Try again.");
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+    return;
+  }
+
+  showSuccess({
+    isCheckout: false,
+    title: "Zoom Call Booked",
+    line1: "Call confirmed for " + (data.booked_for || (date + " at " + time + " CT")),
+    line2: "Confirmations sent to " + fname + ".",
+    line3: "Jaleel has been briefed via email.",
+  });
+}
+
+// ── Success display ───────────────────────────────────────────────
+function showSuccess(opts) {
+  document.getElementById("success-icon-checkout").style.display = opts.isCheckout ? "flex" : "none";
+  document.getElementById("success-icon-zoom").style.display     = opts.isCheckout ? "none" : "flex";
+  document.getElementById("success-title").style.color           = opts.isCheckout ? "#22c55e" : "#2563EB";
+  document.getElementById("success-title").textContent = opts.title;
+  document.getElementById("success-line1").textContent = opts.line1;
+  document.getElementById("success-line2").textContent = opts.line2;
+  document.getElementById("success-line3").textContent = opts.line3;
+  document.getElementById("form-view").style.display   = "none";
+  document.getElementById("success").style.display     = "block";
+  window.scrollTo(0, 0);
+}
+
+// ── Reset ─────────────────────────────────────────────────────────
 function resetForm() {
+  requestId = crypto.randomUUID();
   document.getElementById("form-view").style.display = "block";
-  document.getElementById("success").style.display = "none";
-  ["fname","biz","email","phone"].forEach(id => document.getElementById(id).value = "");
-  productType = "app";
-  selectedPkg = null;
-  platform    = "ios";
+  document.getElementById("success").style.display   = "none";
+  ["fname","lname","biz","email","phone","sdr"].forEach(id => document.getElementById(id).value = "");
+  document.getElementById("z-date").value = "";
+  document.getElementById("z-time").value = "";
+  productType    = "app";
+  recWorkflow    = "checkout";
+  deliveryMethod = "sms";
+  selectedPkg    = null;
+  platform       = "ios";
   document.getElementById("tab-app").classList.add("active");
   document.getElementById("tab-rec").classList.remove("active");
   document.getElementById("app-section").classList.remove("hidden");
@@ -342,12 +703,29 @@ function resetForm() {
   document.getElementById("btn-ios").classList.add("active");
   document.getElementById("btn-dual").classList.remove("active");
   document.getElementById("summary").classList.remove("visible");
-  btn = document.getElementById("submit-btn");
-  btn.disabled = false;
-  btn.textContent = "Send Payment Link";
+  document.getElementById("wf-checkout").classList.add("active");
+  document.getElementById("wf-zoom").classList.remove("active");
+  document.getElementById("checkout-section").classList.remove("hidden");
+  document.getElementById("zoom-section").classList.add("hidden");
+  document.getElementById("dm-sms").classList.add("active");
+  document.getElementById("dm-email").classList.remove("active");
+  updateFieldVisibility();
   clearErr();
   window.scrollTo(0, 0);
 }
+
+// ── Pre-fill from URL (?biz=) ─────────────────────────────────────
+(function(){
+  const bizParam = new URLSearchParams(window.location.search).get("biz");
+  if (bizParam) {
+    const el = document.getElementById("biz");
+    if (el) el.value = decodeURIComponent(bizParam);
+    document.getElementById("tab-rec").click();
+  }
+})();
+
+// ── Init ──────────────────────────────────────────────────────────
+initAuth();
 </script>
 </body>
 </html>
