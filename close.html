@@ -136,12 +136,12 @@ textarea{resize:vertical;min-height:72px}
   <div class="field">
     <label>Product</label>
     <div class="type-tabs">
-      <div class="type-tab active" id="tab-app" onclick="setProductType('app')">Mobile App</div>
-      <div class="type-tab" id="tab-rec" onclick="setProductType('receptionist')">AI Receptionist</div>
+      <div class="type-tab" id="tab-app" onclick="setProductType('app')">Mobile App</div>
+      <div class="type-tab active" id="tab-rec" onclick="setProductType('receptionist')">AI Receptionist</div>
     </div>
   </div>
 
-  <div id="app-section">
+  <div id="app-section" class="hidden">
     <div class="field">
       <label>Package</label>
       <div class="pkg-grid" id="pkg-grid">
@@ -159,7 +159,7 @@ textarea{resize:vertical;min-height:72px}
     </div>
   </div>
 
-  <div id="rec-section" class="hidden">
+  <div id="rec-section">
     <div class="rec-card">
       <div class="rec-top">
         <div><div class="rec-name">AI Receptionist</div><div class="rec-tagline">Answers calls 24/7. Books appointments.<br>Handles FAQs. No staff needed.</div></div>
@@ -271,7 +271,7 @@ const API_LOOKUP=BASE+"/lookup-close-lead";
 const APP_PRICES={launch:{ios:300000,dual:600000},growth:{ios:550000,dual:1100000},enterprise:{ios:950000,dual:1900000}};
 const LC_STEPS=["New Lead","Qualified","Information Sent","Zoom Scheduled","Callback Scheduled","Checkout Sent","Customer"];
 
-let productType="app",currentAction="checkout",infoDelivery="sms",coDelivery="sms";
+let productType="receptionist",currentAction="checkout",infoDelivery="sms",coDelivery="sms";
 let selectedPkg=null,platform="ios",requestId=crypto.randomUUID(),lookupTimer=null,currentLead=null;
 
 function initAuth(){
@@ -573,9 +573,9 @@ function resetForm(){
   document.getElementById("lead-card").style.display="none";
   ["fname","lname","biz","email","phone","notes","sdr"].forEach(id=>document.getElementById(id).value="");
   ["z-date","z-time","cb-date","cb-time","cb-reason"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
-  productType="app";currentAction="checkout";infoDelivery="sms";coDelivery="sms";selectedPkg=null;platform="ios";
-  document.getElementById("tab-app").classList.add("active");document.getElementById("tab-rec").classList.remove("active");
-  document.getElementById("app-section").classList.remove("hidden");document.getElementById("rec-section").classList.add("hidden");
+  productType="receptionist";currentAction="checkout";infoDelivery="sms";coDelivery="sms";selectedPkg=null;platform="ios";
+  document.getElementById("tab-app").classList.remove("active");document.getElementById("tab-rec").classList.add("active");
+  document.getElementById("app-section").classList.add("hidden");document.getElementById("rec-section").classList.remove("hidden");
   document.querySelectorAll(".pkg-card").forEach(c=>c.classList.remove("active"));
   document.getElementById("btn-ios").classList.add("active");document.getElementById("btn-dual").classList.remove("active");
   document.getElementById("summary").classList.remove("visible");
