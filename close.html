@@ -131,6 +131,13 @@ textarea{resize:vertical;min-height:72px}
     <div id="lc-notes-wrap" class="lead-notes-preview" style="display:none">
       Notes: <span id="lc-notes"></span>
     </div>
+    <div id="lc-objection-wrap" class="lead-notes-preview" style="display:none;border-left:3px solid #f59e0b;margin-top:10px">
+      <strong>Current objection</strong><br>
+      <span id="lc-objection-statement"></span><br>
+      <span id="lc-objection-concern" style="color:#94a3b8"></span><br>
+      <strong>Ask next:</strong> <span id="lc-objection-question"></span><br>
+      <strong>Next action:</strong> <span id="lc-objection-next"></span>
+    </div>
   </div>
 
   <div class="field">
@@ -175,6 +182,7 @@ textarea{resize:vertical;min-height:72px}
       <div class="action-card" data-action="zoom" onclick="setAction('zoom')"><div class="action-icon">📹</div><div class="action-label">Book Zoom Call</div></div>
       <div class="action-card" data-action="callback" onclick="setAction('callback')"><div class="action-icon">📞</div><div class="action-label">Schedule Callback</div></div>
       <div class="action-card" data-action="followup" onclick="setAction('followup')"><div class="action-icon">📌</div><div class="action-label">Follow-up Needed</div></div>
+      <div class="action-card" data-action="objection" onclick="setAction('objection')"><div class="action-icon">?</div><div class="action-label">Record Objection</div></div>
       <div class="action-card danger" data-action="notinterested" onclick="setAction('notinterested')"><div class="action-icon">✗</div><div class="action-label">Not Interested</div></div>
     </div>
 
@@ -184,6 +192,27 @@ textarea{resize:vertical;min-height:72px}
         <div class="dm-btn active" id="info-dm-sms" onclick="setInfoDelivery('sms')">📱 Text Message</div>
         <div class="dm-btn" id="info-dm-email" onclick="setInfoDelivery('email')">📧 Email</div>
       </div>
+    </div>
+
+    <div id="sub-objection" class="hidden" style="margin-top:16px;padding:14px;border:1px solid #334155;border-radius:10px">
+      <div class="field"><label>Exact words used by the prospect</label><textarea id="obj-statement" rows="2" placeholder="Example: I need to think about it"></textarea></div>
+      <div class="field"><label>Objection category</label>
+        <select id="obj-category" onchange="updateObjectionGuidance()">
+          <option value="think_about_it">Needs to think</option><option value="price_value">Price or value</option>
+          <option value="timing">Timing</option><option value="existing_coverage">Existing coverage</option>
+          <option value="ai_trust">AI trust</option><option value="information_request">Information requested</option>
+          <option value="decision_maker">Another decision maker</option><option value="fit_capability">Fit or capability</option>
+          <option value="firm_rejection">Firm rejection</option><option value="other">Other</option>
+        </select>
+      </div>
+      <div class="field"><label>Prospect's stated problem</label><textarea id="obj-pain" rows="2" placeholder="Use only what they actually told you"></textarea></div>
+      <div class="field"><label>Underlying concern discovered</label><textarea id="obj-concern" rows="2"></textarea></div>
+      <div class="field"><label>Response delivered</label><textarea id="obj-response" rows="2"></textarea></div>
+      <div class="field"><label>Agreed next action</label><input id="obj-next-action" type="text"></div>
+      <div class="field"><label>Follow-up due</label><input id="obj-due" type="datetime-local"></div>
+      <div class="field"><label>Resolution</label><select id="obj-resolved"><option value="">Unclear / still diagnosing</option><option value="false">Unresolved</option><option value="true">Resolved</option></select></div>
+      <div id="obj-guidance" style="background:#0f172a;padding:12px;border-radius:8px;color:#e2e8f0;font-size:13px"></div>
+      <label id="obj-firm-wrap" style="display:none;margin-top:12px"><input id="obj-firm" type="checkbox"> Prospect repeated the rejection after one respectful clarification or explicitly opted out.</label>
     </div>
 
     <div id="sub-checkout">
@@ -337,6 +366,14 @@ function showLead(d){
   const notesWrap=document.getElementById("lc-notes-wrap");
   if(d.notes){document.getElementById("lc-notes").textContent=d.notes.slice(0,120);notesWrap.style.display="block";}
   else{notesWrap.style.display="none";}
+  const objWrap=document.getElementById("lc-objection-wrap"),obj=d.current_objection;
+  if(obj){
+    document.getElementById("lc-objection-statement").textContent=obj.exact_statement||"";
+    document.getElementById("lc-objection-concern").textContent=obj.underlying_concern||obj.category||"";
+    document.getElementById("lc-objection-question").textContent=obj.diagnostic_question||"";
+    document.getElementById("lc-objection-next").textContent=obj.next_action||"";
+    objWrap.style.display="block";
+  }else objWrap.style.display="none";
   document.getElementById("lead-card").style.display="block";
 }
 function hideLead(){currentLead=null;document.getElementById("lead-card").style.display="none";}
@@ -392,12 +429,32 @@ function fmt(c){return"$"+(c/100).toLocaleString("en-US");}
 function setAction(a){
   currentAction=a;
   document.querySelectorAll(".action-card").forEach(c=>c.classList.toggle("active",c.dataset.action===a));
-  ["sub-info","sub-checkout","sub-zoom","sub-callback"].forEach(id=>document.getElementById(id).classList.add("hidden"));
+  ["sub-info","sub-checkout","sub-zoom","sub-callback","sub-objection"].forEach(id=>document.getElementById(id).classList.add("hidden"));
   if(a==="info")document.getElementById("sub-info").classList.remove("hidden");
   else if(a==="checkout")document.getElementById("sub-checkout").classList.remove("hidden");
   else if(a==="zoom")document.getElementById("sub-zoom").classList.remove("hidden");
   else if(a==="callback")document.getElementById("sub-callback").classList.remove("hidden");
+  else if(a==="objection"||a==="notinterested"){document.getElementById("sub-objection").classList.remove("hidden");updateObjectionGuidance();}
   updateFieldVisibility();clearErr();
+}
+const OBJECTION_GUIDANCE={
+price_value:["Is the concern fitting $297 into the budget, or whether it would recover enough business to justify the cost?","If resolved, confirm affirmative intent before offering checkout."],
+timing:["What would need to change for the timing to become right?","Agree to an exact follow-up date and reason."],
+existing_coverage:["How are calls handled after hours, during busy periods, or when that person is unavailable?","Position alongside the team only if a verified gap exists."],
+ai_trust:["Is the concern how it sounds, how it handles customers, or what it is allowed to do?","Offer the browser demo and set a decision follow-up."],
+information_request:["What would you most want the information to clarify?","Send targeted information and establish the next decision point."],
+decision_maker:["What do you think they will want to understand before deciding?","Schedule a joint callback or review date."],
+fit_capability:["What would it need to handle for you to consider it useful?","Demonstrate only verified capabilities."],
+think_about_it:["What part are you still unsure about: price, fit, timing, or something else?","Resolve the named concern or set a concrete follow-up."],
+firm_rejection:["Just so I record this correctly, is it because you already have coverage or because this is not a priority?","Ask once only. If repeated, end respectfully and suppress outreach."],
+other:["What is the main concern you would need resolved before deciding on a next step?","Record the exact concern and agree to the next step."]
+};
+function updateObjectionGuidance(){
+  const cat=document.getElementById("obj-category").value;
+  const g=OBJECTION_GUIDANCE[cat]||OBJECTION_GUIDANCE.other;
+  document.getElementById("obj-guidance").innerHTML="<strong>Ask next:</strong> "+esc(g[0])+"<br><strong>Advance:</strong> "+esc(g[1]);
+  document.getElementById("obj-firm-wrap").style.display=(cat==="firm_rejection"||currentAction==="notinterested")?"block":"none";
+  if(!document.getElementById("obj-next-action").value)document.getElementById("obj-next-action").value=g[1];
 }
 function setInfoDelivery(d){
   infoDelivery=d;
@@ -447,10 +504,14 @@ function updateFieldVisibility(){
     ef.classList.remove("hidden");el.textContent="Email (optional)";eh.textContent="";
     pf.classList.remove("hidden");pl.textContent="Phone (optional)";ph.textContent="";
     btn.textContent="Mark Follow-up Needed";btn.classList.remove("danger");
+  }else if(currentAction==="objection"){
+    ef.classList.remove("hidden");el.textContent="Email (optional)";eh.textContent="";
+    pf.classList.remove("hidden");pl.textContent="Phone (optional)";ph.textContent="";
+    btn.textContent="Record Objection";btn.classList.remove("danger");
   }else if(currentAction==="notinterested"){
     ef.classList.remove("hidden");el.textContent="Email (optional)";eh.textContent="";
     pf.classList.remove("hidden");pl.textContent="Phone (optional)";ph.textContent="";
-    btn.textContent="Mark Not Interested";btn.classList.add("danger");
+    btn.textContent="Mark Firm Rejection";btn.classList.add("danger");
   }
 }
 
@@ -522,8 +583,22 @@ async function doZoom(fname,lname,biz,email,phone,sdr,headers,btn,orig){
 }
 
 async function doAction(fname,lname,biz,email,phone,sdr,notes,headers,btn,orig){
-  const action=currentAction==="followup"?"follow_up":currentAction==="notinterested"?"not_interested":currentAction==="info"?"send_info":currentAction;
+  const action=currentAction==="followup"?"follow_up":currentAction==="notinterested"?"not_interested":currentAction==="objection"?"record_objection":currentAction==="info"?"send_info":currentAction;
   const body={action,request_id:requestId,first_name:fname,last_name:lname||undefined,business_name:biz,email:email||undefined,phone:phone||undefined,sdr_id:sdr||undefined,notes:notes||undefined};
+  if(action==="record_objection"||action==="not_interested"){
+    const statement=document.getElementById("obj-statement").value.trim();
+    if(!statement){btn.disabled=false;btn.textContent=orig;return showErr("Enter the prospect's exact objection.");}
+    body.objection_exact_statement=statement;
+    body.objection_category=document.getElementById("obj-category").value;
+    body.objection_stated_pain=document.getElementById("obj-pain").value.trim()||undefined;
+    body.objection_underlying_concern=document.getElementById("obj-concern").value.trim()||undefined;
+    body.objection_response_delivered=document.getElementById("obj-response").value.trim()||undefined;
+    body.objection_next_action=document.getElementById("obj-next-action").value.trim()||undefined;
+    const due=document.getElementById("obj-due").value;body.objection_follow_up_due_at=due?new Date(due).toISOString():undefined;
+    const resolved=document.getElementById("obj-resolved").value;body.objection_resolved=resolved===""?undefined:resolved==="true";
+    body.objection_firm=document.getElementById("obj-firm").checked;
+    if(action==="not_interested"&&!body.objection_firm){btn.disabled=false;btn.textContent=orig;return showErr("Ask one respectful clarification first. Only mark firm rejection if they repeat the no or explicitly opt out.");}
+  }
   if(action==="send_info"){
     const dm=infoDelivery;
     if(dm==="sms"&&!phone){btn.disabled=false;btn.textContent=orig;return showErr("Enter the prospect's phone number.");}
@@ -540,12 +615,13 @@ async function doAction(fname,lname,biz,email,phone,sdr,notes,headers,btn,orig){
     if(!email&&!phone){btn.disabled=false;btn.textContent=orig;return showErr("Enter at least an email or phone.");}
     body.callback_date=date;body.callback_time=time;body.callback_reason=reason||undefined;
   }
-  if((action==="follow_up"||action==="not_interested")&&!email&&!phone){btn.disabled=false;btn.textContent=orig;return showErr("Enter at least an email or phone to identify the lead.");}
+  if((action==="follow_up"||action==="not_interested"||action==="record_objection")&&!email&&!phone){btn.disabled=false;btn.textContent=orig;return showErr("Enter at least an email or phone to identify the lead.");}
   const res=await fetch(API_ACTION,{method:"POST",headers,body:JSON.stringify(body)});
   if(res.status===401){clearToken();btn.disabled=false;btn.textContent=orig;return;}
   const d=await res.json();
   if(!res.ok||!d.success){btn.disabled=false;btn.textContent=orig;return showErr(d.error||"Action could not be completed.");}
-  if(action==="send_info"){const dest=infoDelivery==="sms"?"their phone":email;showSuccess({icon:"📋",cls:"info",color:"#93c5fd",title:"Information Delivered",line1:"AI Receptionist overview "+(infoDelivery==="sms"?"texted to ":"emailed to ")+dest,detail:"",line2:"Lead stage: Information Sent. No checkout sent."});}
+  if(action==="record_objection"){showSuccess({icon:"?",cls:"info",color:"#f59e0b",title:"Objection Recorded",line1:"The concern and next question were saved for "+fname+" at "+biz+".",detail:"",line2:"No checkout or outreach was sent."});}
+  else if(action==="send_info"){const dest=infoDelivery==="sms"?"their phone":email;showSuccess({icon:"📋",cls:"info",color:"#93c5fd",title:"Information Delivered",line1:"AI Receptionist overview "+(infoDelivery==="sms"?"texted to ":"emailed to ")+dest,detail:"",line2:"Lead stage: Information Sent. No checkout sent."});}
   else if(action==="callback"){showSuccess({icon:"📞",cls:"callback",color:"#22c55e",title:"Callback Scheduled",line1:"Callback saved for "+fname+" at "+biz,detail:d.booked_for||"",line2:"Lead stage: Callback Scheduled."});}
   else if(action==="follow_up"){showSuccess({icon:"📌",cls:"followup",color:"#facc15",title:"Follow-up Needed",line1:fname+" at "+biz+" flagged for follow-up.",detail:"",line2:"Lead stage updated. Pipeline notified."});}
   else if(action==="not_interested"){showSuccess({icon:"✗",cls:"notinterested",color:"#fca5a5",title:"Not Interested",line1:fname+" at "+biz+" removed from active pipeline.",detail:"",line2:"Lead marked disqualified. No further outreach."});}
@@ -569,7 +645,8 @@ function resetForm(){
   document.getElementById("form-view").style.display="block";
   document.getElementById("success").style.display="none";
   document.getElementById("lead-card").style.display="none";
-  ["fname","lname","biz","email","phone","notes","sdr"].forEach(id=>document.getElementById(id).value="");
+  ["fname","lname","biz","email","phone","notes","sdr","obj-statement","obj-pain","obj-concern","obj-response","obj-next-action","obj-due"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("obj-resolved").value="";document.getElementById("obj-category").value="think_about_it";document.getElementById("obj-firm").checked=false;
   ["z-date","z-time","cb-date","cb-time","cb-reason"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
   productType="receptionist";currentAction="checkout";infoDelivery="sms";coDelivery="sms";selectedPkg=null;platform="ios";
   document.getElementById("tab-app").classList.remove("active");document.getElementById("tab-rec").classList.add("active");
@@ -579,7 +656,7 @@ function resetForm(){
   document.getElementById("summary").classList.remove("visible");
   document.querySelectorAll(".action-card").forEach(c=>c.classList.remove("active"));
   document.querySelector('[data-action="checkout"]').classList.add("active");
-  ["sub-info","sub-zoom","sub-callback"].forEach(id=>document.getElementById(id).classList.add("hidden"));
+  ["sub-info","sub-zoom","sub-callback","sub-objection"].forEach(id=>document.getElementById(id).classList.add("hidden"));
   document.getElementById("sub-checkout").classList.remove("hidden");
   document.getElementById("info-dm-sms").classList.add("active");document.getElementById("info-dm-email").classList.remove("active");
   document.getElementById("co-dm-sms").classList.add("active");document.getElementById("co-dm-email").classList.remove("active");
