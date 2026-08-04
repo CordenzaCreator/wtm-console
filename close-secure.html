@@ -21,6 +21,7 @@ const OPERATIONS={
   "/lookup-close-lead":"lookup",
   "/send-close-checkout":"send_checkout",
   "/book-close-zoom":"book_zoom",
+  "/capture-inperson-lead":"mobile_app_checkout",
   "/close-console-action":null
 };
 const actionOperation={send_info:"send_info",callback:"callback",follow_up:"follow_up",not_interested:"not_interested",record_objection:"record_objection"};
@@ -57,10 +58,7 @@ function installBridge(win){
     if(!url.startsWith(BASE))return nativeFetch(input,init);
     let body={};try{body=init.body?JSON.parse(init.body):{};}catch{}
     const operation=gatewayOperation(url,body);
-    if(!operation){
-      if(url.endsWith("/capture-inperson-lead"))return new Response(JSON.stringify({success:false,error:"Mobile app checkout is temporarily available through the legacy Console only during secure migration."}),{status:403,headers:{"Content-Type":"application/json"}});
-      return nativeFetch(input,init);
-    }
+    if(!operation)return nativeFetch(input,init);
     const session=sessionStorage.getItem(SESSION_KEY),legacy=sessionStorage.getItem(LEGACY_KEY);
     const headers=apiHeaders(session?{"X-Console-Session":session}:{"X-Console-Token":legacy});
     const res=await nativeFetch(BASE+"/close-console-gateway",{method:"POST",headers,body:JSON.stringify({operation,payload:body})});
