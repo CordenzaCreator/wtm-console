@@ -92,6 +92,7 @@ textarea{resize:vertical;min-height:72px}
 #success p{color:#6b7a90;font-size:14px;line-height:1.6;margin-bottom:6px}
 .s-detail{color:#e6ecf5;font-size:15px;font-weight:600;margin-top:8px}
 .new-btn{margin-top:28px;width:100%;padding:14px;background:#1f2a44;color:#2563EB;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer}
+.new-btn.secondary{margin-top:10px;color:#c8d3e2}
 .err-bar{background:#2d0a0a;border:1px solid #7f1d1d;color:#fca5a5;padding:12px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none}
 .err-bar.visible{display:block}
 .hidden{display:none!important}
@@ -281,7 +282,8 @@ textarea{resize:vertical;min-height:72px}
   <p id="s-line1"></p>
   <div class="s-detail" id="s-detail"></div>
   <p id="s-line2" style="margin-top:12px"></p>
-  <button class="new-btn" onclick="resetForm()">Close Another</button>
+  <button class="new-btn" id="resend-btn" onclick="prepareResend()" style="display:none">Send Again</button>
+  <button class="new-btn secondary" onclick="resetForm()">Close Another</button>
 </div>
 </div>
 
@@ -621,7 +623,7 @@ async function doAction(fname,lname,biz,email,phone,sdr,notes,headers,btn,orig){
   const d=await res.json();
   if(!res.ok||!d.success){btn.disabled=false;btn.textContent=orig;return showErr(d.error||"Action could not be completed.");}
   if(action==="record_objection"){showSuccess({icon:"?",cls:"info",color:"#f59e0b",title:"Objection Recorded",line1:"The concern and next question were saved for "+fname+" at "+biz+".",detail:"",line2:"No checkout or outreach was sent."});}
-  else if(action==="send_info"){const dest=infoDelivery==="sms"?"their phone":email;showSuccess({icon:"📋",cls:"info",color:"#93c5fd",title:"Information Delivered",line1:"AI Receptionist overview "+(infoDelivery==="sms"?"texted to ":"emailed to ")+dest,detail:"",line2:"Lead stage: Information Sent. No checkout sent."});}
+  else if(action==="send_info"){const dest=infoDelivery==="sms"?"their phone":email;showSuccess({icon:"📋",cls:"info",color:"#93c5fd",title:"Information Sent",line1:"AI Receptionist overview "+(infoDelivery==="sms"?"texted to ":"emailed to ")+dest,detail:"",line2:"Lead stage: Information Sent. No checkout sent."});}
   else if(action==="callback"){showSuccess({icon:"📞",cls:"callback",color:"#22c55e",title:"Callback Scheduled",line1:"Callback saved for "+fname+" at "+biz,detail:d.booked_for||"",line2:"Lead stage: Callback Scheduled."});}
   else if(action==="follow_up"){showSuccess({icon:"📌",cls:"followup",color:"#facc15",title:"Follow-up Needed",line1:fname+" at "+biz+" flagged for follow-up.",detail:"",line2:"Lead stage updated. Pipeline notified."});}
   else if(action==="not_interested"){showSuccess({icon:"✗",cls:"notinterested",color:"#fca5a5",title:"Not Interested",line1:fname+" at "+biz+" removed from active pipeline.",detail:"",line2:"Lead marked disqualified. No further outreach."});}
@@ -635,9 +637,24 @@ function showSuccess(o){
   document.getElementById("s-line1").textContent=o.line1;
   document.getElementById("s-detail").textContent=o.detail;
   document.getElementById("s-line2").textContent=o.line2;
+  const repeatable=productType==="app"||(productType==="receptionist"&&(currentAction==="checkout"||currentAction==="info"));
+  const resendBtn=document.getElementById("resend-btn");
+  resendBtn.style.display=repeatable?"block":"none";
+  resendBtn.textContent=productType==="app"?"Send Payment Link Again":currentAction==="info"?"Send Information Again":"Send Checkout Link Again";
   document.getElementById("form-view").style.display="none";
   document.getElementById("success").style.display="block";
   window.scrollTo(0,0);
+}
+
+function prepareResend(){
+  requestId=crypto.randomUUID();
+  document.getElementById("form-view").style.display="block";
+  document.getElementById("success").style.display="none";
+  const btn=document.getElementById("submit-btn");
+  btn.disabled=false;
+  updateFieldVisibility();
+  clearErr();
+  btn.scrollIntoView({behavior:"smooth",block:"center"});
 }
 
 function resetForm(){
