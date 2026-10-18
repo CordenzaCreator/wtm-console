@@ -1,11 +1,7 @@
-# WebToMobile Pro Posting Console
+# WebToMobile Pro Consoles
 
-Mobile-friendly content review and posting interface for WebToMobile Pro.
+Static console pages for WebToMobile Pro, hosted on GitHub Pages.
 
-Single-file static site hosted on GitHub Pages. Reads from the `wtm-posting-console` Supabase edge function on the WTM Supabase project (`dhriiwtpsaorqlxiuayu`). Daily generator `wtm-generate-manual-posts` fills the queue at 7 AM CT.
+Live here: the Close Console (`close.html`, secure wrapper `close-secure.html`) and demo pages (`demo.html`).
 
-Platforms: LinkedIn, Instagram, TikTok, Facebook.
-
-Workflow: Pull content. Post it. Mark done.
-
-This repo is **separate from `gg-console`** by design. The two consoles point at different Supabase projects, different tables, and different edge functions. They do not share data.
+Retired 2026-10-17: the manual Posting Console. Posting runs through the automated pipeline now, so the console page, its `wtm-posting-console` edge function, and its `wtm-generate-manual-posts` generator were removed.
