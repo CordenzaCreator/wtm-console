@@ -45,9 +45,18 @@ td a{color:#2563EB}
 .loading{color:#2563EB;text-align:center;padding:60px;font-size:16px}
 .hint{color:#6b7a90;font-size:12px;margin-top:6px;font-style:italic}
 video.prev{background:#000}
+#gate{position:fixed;inset:0;z-index:50;background:#0a0e1a;display:none;align-items:center;justify-content:center;padding:20px}
+.gatebox{width:100%;max-width:390px;background:#111827;border:1px solid #1f2a44;border-radius:14px;padding:28px 24px}
+.gatebox h2{color:#2563EB;margin:0 0 8px;font-size:20px}
+.gatebox p{color:#94a3b8;font-size:13px;line-height:1.5;margin:0 0 18px}
+.gatebox input{width:100%;padding:14px;border-radius:8px;border:1px solid #334155;background:#0a0e1a;color:#fff;font-size:16px}
+.gatebox button{width:100%;margin-top:12px;padding:14px;border:0;border-radius:8px;background:#2563EB;color:#fff;font-weight:700;font-size:15px;cursor:pointer}
+.gateerr{display:none;margin-top:10px;color:#fca5a5;font-size:13px}
+
 </style>
 </head>
 <body>
+<div id="gate"><div class="gatebox"><h2>Posting Console Access</h2><p>Enter the individual credential issued for the consoles. It is exchanged for a secure session before the posting queue loads. Same credential as the Close Console.</p><input id="credential" type="password" placeholder="Paste access credential" autocomplete="off"><button id="unlock">Unlock Console</button><div class="gateerr" id="gateerr"></div></div></div>
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
   <div style="width:90px"></div>
   <div style="text-align:center">
@@ -60,7 +69,14 @@ video.prev{background:#000}
 <div id="app"><div class="loading">Loading posts...</div></div>
 <div class="toast" id="toast"></div>
 <script>
-const API="https://dhriiwtpsaorqlxiuayu.supabase.co/functions/v1/wtm-posting-console";
+const BASE="https://dhriiwtpsaorqlxiuayu.supabase.co/functions/v1";
+const API=BASE+"/wtm-posting-console";
+const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRocmlpd3Rwc2FvcnFseGl1YXl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc1MDQ3MDAsImV4cCI6MjA4MzA4MDcwMH0.l_-EJXZbxua0NZxaw8FnFM_S-JDCwagObFhXNQ4GKzM";
+const SESSION_KEY="wtm_cc_session";
+function apiHeaders(extra={}){const h={"Content-Type":"application/json",apikey:ANON,Authorization:"Bearer "+ANON,...extra};const s=localStorage.getItem(SESSION_KEY);if(s)h["X-Console-Session"]=s;return h;}
+function showGate(msg){const g=document.getElementById("gate");g.style.display="flex";if(msg){const e=document.getElementById("gateerr");e.textContent=msg;e.style.display="block";}}
+async function verifySession(){const s=localStorage.getItem(SESSION_KEY);if(!s)return false;try{const r=await fetch(BASE+"/verify-close-console-session",{method:"POST",headers:apiHeaders(),body:"{}"});if(!r.ok){localStorage.removeItem(SESSION_KEY);return false;}return true;}catch{return false;}}
+async function unlock(){const cred=document.getElementById("credential").value.trim();const e=document.getElementById("gateerr");e.style.display="none";if(!cred){e.textContent="Enter your access credential.";e.style.display="block";return;}document.getElementById("unlock").disabled=true;try{const r=await fetch(BASE+"/create-close-console-session",{method:"POST",headers:apiHeaders(),body:JSON.stringify({credential:cred})});const d=await r.json();if(!r.ok||!d.success||!d.session_token)throw new Error(d.error||"Access denied");localStorage.setItem(SESSION_KEY,d.session_token);document.getElementById("credential").value="";document.getElementById("gate").style.display="none";load();}catch(err){e.textContent=err.message||"Unable to unlock";e.style.display="block";document.getElementById("unlock").disabled=false;}}
 const app=document.getElementById("app");
 const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
 
@@ -130,7 +146,8 @@ function renderCard(p){
 
 async function load(){
   try{
-    const r=await fetch(API);
+    const r=await fetch(API,{headers:apiHeaders()});
+    if(r.status===401){localStorage.removeItem(SESSION_KEY);showGate('Your session ended. Enter your credential to continue.');return;}
     const d=await r.json();
     const posts=d.posts||[];
     if(posts.length===0){app.innerHTML='<div class="empty">No posts ready. Check back after 7 AM CT.</div>';return;}
@@ -169,19 +186,21 @@ function copyVo(id){copyText(document.getElementById("vo-"+id).textContent,"Voic
 
 async function markPosted(id){
   if(!confirm("Mark as posted?"))return;
-  const r=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"mark_posted",id})});
+  const r=await fetch(API,{method:"POST",headers:apiHeaders(),body:JSON.stringify({action:"mark_posted",id})});
   if(r.ok){document.getElementById("c-"+id).classList.add("done");toast("Posted!")}
   else toast("Error");
 }
 async function skipPost(id){
   const reason=prompt("Skip reason (optional):");
   if(reason===null)return;
-  const r=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"skip",id,reason})});
+  const r=await fetch(API,{method:"POST",headers:apiHeaders(),body:JSON.stringify({action:"skip",id,reason})});
   if(r.ok){document.getElementById("c-"+id).classList.add("done");toast("Skipped")}
   else toast("Error");
 }
 
-load();
+document.getElementById("unlock").addEventListener("click",unlock);
+document.getElementById("credential").addEventListener("keydown",e=>{if(e.key==="Enter")unlock();});
+(async()=>{if(await verifySession()){load();}else{showGate();}})();
 </script>
 </body>
 </html>
